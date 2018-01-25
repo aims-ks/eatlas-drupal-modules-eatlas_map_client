@@ -6,6 +6,9 @@ include_once('eatlas_map_client.constants.inc');
  * TODO Verify if library is installed, tell how to install it
  */
 
+/**
+ * @return mixed
+ */
 function eatlas_map_client_schema() {
 	$schema[EATLAS_MAP_CLIENTS_LIST_DB_TABLE] = array(
 		'description' => 'The eAtlas Map Client configuration table.',
@@ -25,25 +28,9 @@ function eatlas_map_client_schema() {
 				'type' => 'text',
 				'size' => 'normal' // Up to 16 KB
 			)
-
-			// Example of other fields that we may add later (copied from the Splash Screen module).
-			/*
-			'bg_image' => array(
-				'description' => 'Splash Screen background image.',
-				'type' => 'text',
-				'size' => 'normal' // Up to 16 KB
-			),
-			'body' => array(
-				'description' => 'Splash Screen HTML body.',
-				'type' => 'text',
-				'size' => 'medium' // Up to 16 MB
-			)
-			*/
 		),
 		'primary key' => array('mcid')
 	);
 
 	return $schema;
 }
-
-?>
