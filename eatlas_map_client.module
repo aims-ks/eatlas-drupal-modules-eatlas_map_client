@@ -58,11 +58,13 @@ function eatlas_map_client_menu() {
  * Implements hook_help().
  */
 function eatlas_map_client_help($path, $arg) {
+	$output = '';
 	switch ($path) {
 		case 'admin/config/eatlas/eatlas_map_client':
 			$output = '<p>' . t('Map Clients are used to show a map. Each Map Client create a block that needs to be configure and associated to a URL.') . '</p>';
-			return $output;
 	}
+
+	return $output;
 }
 
 /**
@@ -81,12 +83,15 @@ function _eatlas_map_client_edit_access($mcid) {
 	return TRUE; // TODO
 }
 
+/**************************************
+ * Blocks
+ **************************************/
 
 /**
- * Blocks
+ * Implement hook_block_info
+ *
+ * @return array
  */
-
-// hook_block_info
 function eatlas_map_client_block_info() {
 	$blocks = array();
 
@@ -106,8 +111,12 @@ function eatlas_map_client_block_info() {
 	return $blocks;
 }
 
-// hook_block_configure
-// https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7.x
+/**
+ * Implement hook_block_configure
+ * https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7.x
+ * @param string $delta
+ * @return array
+ */
 function eatlas_map_client_block_configure($delta = '') {
 	$form = array();
 
@@ -120,43 +129,31 @@ function eatlas_map_client_block_configure($delta = '') {
 	return $form;
 }
 
-// Form API:
-//   https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7.x
+/**
+ * Form API:
+ * 		https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7.x
+ * @param $form
+ * @param $map_client
+ */
 function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 	$form['eatlas_map_client_parameters'] = array(
-		'#type' => 'textfield', 
-		'#title' => t('Map Client parameters'), 
-		'#size' => 120, 
+		'#type' => 'textfield',
+		'#title' => t('Map Client parameters'),
+		'#size' => 120,
 		'#maxlength' => 2048,
-		'#description' => t('[DEVEL] The string of GET parameters that is sent to the AtlasMapper.'), 
+		'#description' => t('[DEVEL] The string of GET parameters that is sent to the AtlasMapper.'),
 		'#default_value' => ($map_client && property_exists($map_client, 'parameters')) ? $map_client->parameters : ''
 	);
-
-	/*
-	$form['eatlas_map_client_bg_image'] = array(
-		'#type' => 'managed_file', 
-		'#title' => t('Map Client background image'), 
-		'#description' => t('The image to display ...'), 
-		'#default_value' => ($map_client && property_exists($map_client, 'bg_image')) ? $map_client->bg_image : '',
-		'#upload_location' => 'public://eatlas_map_client/',
-		'#upload_validators' => array(
-			'file_validate_extensions' => array('gif png jpg jpeg'),
-		)
-	);
-
-	$form['eatlas_map_client_body'] = array(
-		'#type' => 'text_format', 
-		'#title' => t('Map Client content'), 
-		'#size' => 60, 
-		'#description' => t('The text which will be displayed ...'), 
-		'#default_value' => ($map_client && property_exists($map_client, 'body')) ? $map_client->body : ''
-	);
-	*/
 }
 
-// hook_block_save
-// Save the value set by the user.
-// Fields defined in "hook_block_configure".
+/**
+ * Implement hook_block_save.
+ *
+ * Save the value set by the user. Fields defined in "hook_block_configure".
+ * @param string $delta
+ * @param array $edit
+ * @throws Exception
+ */
 function eatlas_map_client_block_save($delta = '', $edit = array()) {
 	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENTS_BLOCK_PREFIX)) {
 		$mcid = substr($delta, strlen(EATLAS_MAP_CLIENTS_BLOCK_PREFIX));
@@ -165,7 +162,11 @@ function eatlas_map_client_block_save($delta = '', $edit = array()) {
 	}
 }
 
-// hook_block_view
+/**
+ * Implement hook_block_view
+ * @param string $delta
+ * @return array
+ */
 function eatlas_map_client_block_view($delta = '') {
 	$block = array();
 
@@ -174,14 +175,6 @@ function eatlas_map_client_block_view($delta = '') {
 		$map_client = eatlas_map_client_load($mcid);
 
 		if ($map_client) {
-			$current_path = current_path();
-
-			$eatlas_map_client_parameters = $map_client->parameters;
-			//$eatlas_map_client_bg_image = $map_client->bg_image;
-			//$eatlas_map_client_body = $map_client->body;
-
-			// TODO Add JavaScript file HERE (using drupal_add_js or something like that)
-
 			// Hide the block title.
 			// NOTE: The API suggest to use $block['subject'] but that doesn't work.
 			//     https://api.drupal.org/api/drupal/modules%21block%21block.api.php/function/hook_block_view/7.x
@@ -190,27 +183,30 @@ function eatlas_map_client_block_view($delta = '') {
 			$block['subject'] = NULL;
 			$block['title'] = '<none>';
 
-
 			// Define the rendering of the block
 			// Add library to the block using "#attached"
 			$map_div_id = 'map_' . check_plain($delta);
-			$block['content'] =
-				array(
-					'#markup' => '<div class="map_eatlas_map_client" id="' . $map_div_id . '"><h1>EATLAS MAP CLIENT: ' . check_plain($eatlas_map_client_parameters) . '</h1></div>',
-					'#attached' => array(
-						'js' => array(
-							'sites/all/libraries/openlayers/ol.js',
-							'sites/all/libraries/mapping-client/js/aims-map-withdeps.js',
-							drupal_get_path('module', 'eatlas_map_client') . '/js/eatlas_map_client.js'
-						)
+			$block['content'] = array(
+				'#markup' => '<div class="map_eatlas_map_client" id="' . $map_div_id . '"></div>',
+				'#attached' => array(
+					'js' => array(
+						'sites/all/libraries/openlayers/ol.js',
+						'sites/all/libraries/mapping-client/js/aims-map-withdeps.js',
+						drupal_get_path('module', 'eatlas_map_client') . '/js/eatlas_map_client.js'
 					)
-				);
+				)
+			);
 		}
 	}
 
 	return $block;
 }
 
+/**
+ * @param $mcid
+ * @param array $values
+ * @return null|stdClass
+ */
 function _get_edited_map_client($mcid, $values = array()) {
 	$map_client = NULL;
 	if ($mcid !== NULL) {
@@ -222,8 +218,6 @@ function _get_edited_map_client($mcid, $values = array()) {
 	}
 
 	$map_client->parameters = $values['eatlas_map_client_parameters'];
-	//$map_client->bg_image = $values['eatlas_map_client_bg_image'];
-	//$map_client->body = $values['eatlas_map_client_body']['value'];
 
 	return $map_client;
 }
@@ -233,6 +227,9 @@ function _get_edited_map_client($mcid, $values = array()) {
  * Database functions
  */
 
+/**
+ * @return array
+ */
 function eatlas_map_client_load_all () {
 	// DB Select using the Drupal objects
 	//   https://api.drupal.org/api/drupal/includes!database!database.inc/function/db_select/7
@@ -241,7 +238,7 @@ function eatlas_map_client_load_all () {
 	$result = $query->execute();
 
 	$blocks = array();
-	while($data = $result->fetch()) {
+	while($data = $result->fetchAssoc()) {
 		$blocks[] = $data;
 	}
 
@@ -265,7 +262,7 @@ function eatlas_map_client_load($mcid) {
 		->condition('mc.mcid', $mcid, '=');
 	$result = $query->execute();
 
-	$data = $result->fetch();
+	$data = $result->fetchAssoc();
 
 	if (!$data) {
 		return new stdClass();
@@ -278,6 +275,7 @@ function eatlas_map_client_load($mcid) {
  * Follow the convention of node_save.
  * $map_client_block: The Map Client block object to be saved.
  *   https://api.drupal.org/api/drupal/modules%21node%21node.module/function/node_save/7
+ * @throws Exception
  */
 function eatlas_map_client_save($map_client_block) {
 	// Transform the object into an Array to be sent to the DB.
@@ -301,9 +299,10 @@ function eatlas_map_client_save($map_client_block) {
 	return $mcid;
 }
 
-// Event listener callback function
+/**
+ * Event listener callback function
+ * @param $mcid
+ */
 function eatlas_map_client_delete($mcid) {
 	db_delete(EATLAS_MAP_CLIENTS_LIST_DB_TABLE)->condition('mcid', $mcid)->execute();
 }
-
-?>
