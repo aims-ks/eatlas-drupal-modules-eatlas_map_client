@@ -1,0 +1,49 @@
+<?php
+
+include_once('eatlas_map_client.constants.inc');
+
+/**
+ * TODO Verify if library is installed, tell how to install it
+ */
+
+function eatlas_map_client_schema() {
+	$schema[EATLAS_MAP_CLIENTS_LIST_DB_TABLE] = array(
+		'description' => 'The eAtlas Map Client configuration table.',
+		'fields' => array(
+			'mcid' => array(
+				'description' => 'The primary identifier for a Map Client (sequential).',
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE
+			),
+
+			// This is temporary - we will use this field until we have a good idea of what the map client needs as configuration
+			// The field is expected to be used as a way to store the URL GET parameters of the query used to create a map using the AtlasMapper.
+			// This is not a good idea, but that's good enough to get started.
+			'parameters' => array(
+				'description' => 'AtlasMapper URL GET parameters.',
+				'type' => 'text',
+				'size' => 'normal' // Up to 16 KB
+			)
+
+			// Example of other fields that we may add later (copied from the Splash Screen module).
+			/*
+			'bg_image' => array(
+				'description' => 'Splash Screen background image.',
+				'type' => 'text',
+				'size' => 'normal' // Up to 16 KB
+			),
+			'body' => array(
+				'description' => 'Splash Screen HTML body.',
+				'type' => 'text',
+				'size' => 'medium' // Up to 16 MB
+			)
+			*/
+		),
+		'primary key' => array('mcid')
+	);
+
+	return $schema;
+}
+
+?>

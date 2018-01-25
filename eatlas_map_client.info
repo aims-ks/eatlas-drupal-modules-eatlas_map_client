@@ -1,0 +1,18 @@
+name = eAtlas Map Client
+description = eAtlas Map Client developed as a replacement for the AtlasMapper.
+core = 7.x
+
+files[] = eatlas_map_client.module
+
+package = eAtlas
+
+configure = admin/config/eatlas/eatlas_map_client
+
+dependencies[] = eatlas_commons
+
+
+; Attributes used by the update module.
+; There fields needs to be removed if the module is migrated to Drupal.org
+project status url = "http://drupal.eatlas.org.au/modules/eatlas"
+version = "7.x-0.3"
+project = "eatlas_map_client"

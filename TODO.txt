@@ -1,0 +1,9 @@
+The library is in the libraries folder:
+	www/sites/all/libraries/mapping-client
+
+The following files needs to be fixed:
+	app/app-config.json
+	js/bundle.js
+		I hardcodded the path of the library in the config. It should try to figure the path of the library by using an approche similar to CKEditor: define a "getPath" function (that's all I know about it sorry)
+
+
