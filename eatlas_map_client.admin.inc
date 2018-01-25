@@ -5,6 +5,7 @@ include_once('eatlas_map_client.constants.inc');
 
 /**
  * Show a list (table) of all the map clients
+ * @throws Exception
  */
 function _eatlas_map_client_overview() {
 	$output = '<h3>' . t('eAtlas Map Clients overview') . '</h3>';
@@ -45,8 +46,15 @@ function _eatlas_map_client_overview() {
 	return $output;
 }
 
+/**
+ * https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7
+ *
+ * @param $form
+ * @param $form_state
+ * @param null $mcid
+ * @return array
+ */
 function _eatlas_map_client_add_form($form, &$form_state, $mcid = NULL) {
-	// https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7
 	$form = array();
 
 	$map_client = NULL;
@@ -87,11 +95,14 @@ function _eatlas_map_client_add_form($form, &$form_state, $mcid = NULL) {
  * Drupal magic: <form ID>_validate
  * Validate add / edit / delete Map Client form
  */
-function _eatlas_map_client_add_form_validate($form, &$form_state) {}
+function _eatlas_map_client_add_form_validate($form, &$form_state) {
+
+}
 
 /**
  * Drupal magic: <form ID>_submit
  * Submit add / edit / delete Map Client form
+ * @throws Exception
  */
 function _eatlas_map_client_add_form_submit($form, &$form_state) {
 	$form_state['redirect'] = 'admin/config/eatlas/eatlas_map_client';
@@ -109,7 +120,6 @@ function _eatlas_map_client_add_form_submit($form, &$form_state) {
 		'pages' => ''
 	))->execute();
 }
-
 
 /**
  * Display a personalised title for "Delete" Map Client block
@@ -159,5 +169,3 @@ function _eatlas_map_client_form_confirm_delete_submit($form, &$form_state) {
 	$form_state['redirect'] = 'admin/config/eatlas/eatlas_map_client';
 	return;
 }
-
-?>
