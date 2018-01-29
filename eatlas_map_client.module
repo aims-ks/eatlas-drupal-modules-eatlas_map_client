@@ -187,12 +187,17 @@ function eatlas_map_client_block_view($delta = '') {
 			// Add library to the block using "#attached"
 			$map_div_id = 'map_' . check_plain($delta);
 			$block['content'] = array(
-				'#markup' => '<div class="map_eatlas_map_client" id="' . $map_div_id . '"></div>',
+				'#prefix' => '<div class="eatlas-map-client-map-wrapper">',
+				'#markup' => '<div class="eatlas-map-client-map" id="' . $map_div_id . '"></div>',
+				'#suffix' => '</div>',
 				'#attached' => array(
 					'js' => array(
 						'sites/all/libraries/openlayers/ol.js',
 						'sites/all/libraries/mapping-client/js/aims-map-withdeps.js',
 						drupal_get_path('module', 'eatlas_map_client') . '/js/eatlas_map_client.js'
+					),
+					'css' => array(
+						drupal_get_path('module', 'eatlas_map_client') . '/css/eatlas_map_client.css'
 					)
 				)
 			);

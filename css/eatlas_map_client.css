@@ -1,0 +1,122 @@
+/***************************
+	AIMS
+***************************/
+
+/*
+  AIMS standard styling.
+
+  SECTION
+
+  <div class="aims-section">
+      <div class="aims-section-header">
+          <span class="aims-title">
+              Section Title
+          </span>
+          <div class="aims-actions">
+              <button type="button" id="add-layer-button" class="btn btn-link">
+                  <i class="material-icons md-18">add</i>
+              </button>
+          </div>
+      </div>
+      <div class="aims-section-content">
+      </div>
+  </div>
+  ------------------
+  | Title        + |
+  |----------------|
+  | Content        |
+  |                |
+  ------------------
+*/
+
+.aims-section .aims-section-header {
+	display: flex;
+}
+
+.aims-section .aims-section-header .aims-title {
+	flex-shrink: 1;
+	flex-grow: 1;
+}
+
+.aims-section .aims-section-header .aims-actions {
+	flex-shrink: 0;
+	flex-grow: 0;
+}
+
+.aims-section .aims-section-header .aims-actions button.btn-link {
+	padding: 0;
+	border: none;
+	line-height: 0;
+}
+
+/*
+  AIMS section using styling of Bootstrap popover.
+ */
+.aims-section-default .aims-section-header {
+	border-bottom: 1px solid #ddd;
+	background: #f5f5f5;
+	padding: 10px 15px;
+}
+
+.aims-section-default .aims-section-header .aims-title {
+	font-size: 1.2em;
+}
+
+.aims-section-default .aims-section-content {
+	padding: 15px;
+}
+
+/**********************************
+	MAP
+ **********************************/
+
+/*
+  Map wrapper for positioning.
+ */
+.eatlas-map-client-map-wrapper {
+	position: relative;
+}
+
+.eatlas-map-client-map {
+	position: relative;
+	height: 100%;
+}
+
+.eatlas-map-client-map .aims-map-legend {
+	position: absolute;
+	top: 0.5em;
+	right: 0.5em;
+	padding: 5px;
+	max-width: 200px !important;
+	max-height: 85%;
+	overflow-y: auto;
+	background-color: white;
+	border-radius: 4px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #000000;
+}
+
+.eatlas-map-client-map .aims-map-legend img {
+	max-width: 100%;
+}
+
+.eatlas-map-client-map .aims-map-show-layers-button {
+	position: absolute;
+	left: 0.5em;
+	top: 4.5em;
+}
+
+.eatlas-map-client-map .aims-map-show-layers-dialog {
+	position: absolute;
+	top: 0;
+	left: 34px;
+	border: 1px solid lightgray;
+	background: white;
+}
+
+.eatlas-map-client-map .aims-map-show-layers-dialog .overlay-layers-list,
+.eatlas-map-client-map .aims-map-show-layers-dialog .base-layers-list {
+	list-style-type: none;
+	padding-left: 20px;
+}

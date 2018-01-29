@@ -3,10 +3,11 @@
 	$(document).ready(function(){
 		console.log('Loading eAtlas Map Clients');
 
-		$('.map_eatlas_map_client').each(function() {
+		$('.eatlas-map-client-map').each(function() {
 			var mapClient = new aimsMap.MapClient($(this).attr('id'), {
 				projection: 'EPSG:4326',
-				configUrl: '//maps.eatlas.org.au/atlasmapper/client/gbrf/config/main.json'
+				configUrl: '//maps.eatlas.local/atlasmapper/client/gbrf/config/main.json'
+				// configUrl: '//maps.eatlas.org.au/atlasmapper/client/gbrf/config/main.json'
 			});
 			mapClient.init();
 		});
