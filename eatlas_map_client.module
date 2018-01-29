@@ -97,7 +97,7 @@ function eatlas_map_client_block_info() {
 
 	$map_client_array = eatlas_map_client_load_all();
 	foreach ($map_client_array as $map_client) {
-		$block_id = EATLAS_MAP_CLIENTS_BLOCK_PREFIX . $map_client['mcid'];
+		$block_id = EATLAS_MAP_CLIENTS_BLOCK_PREFIX . $map_client->mcid;
 		$block = block_load('eatlas_map_client', $block_id);
 
 		$blocks[$block_id] = array(
@@ -244,7 +244,7 @@ function eatlas_map_client_load_all () {
 
 	$blocks = array();
 	while($data = $result->fetchAssoc()) {
-		$blocks[] = $data;
+		$blocks[] = (object) $data;
 	}
 
 	return $blocks;
@@ -273,7 +273,7 @@ function eatlas_map_client_load($mcid) {
 		return new stdClass();
 	}
 
-	return $data;
+	return (object) $data;
 }
 
 /**
