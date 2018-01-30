@@ -136,7 +136,23 @@ function eatlas_map_client_block_configure($delta = '') {
  * @param $map_client
  */
 function _eatlas_map_client_add_form_fields(&$form, $map_client) {
-	$form['eatlas_map_client_parameters'] = array(
+	$form['map_config_host'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Map configuration host'),
+		'#description' => t('Host for getting the map configuration'),
+		'#default_value' => property_exists($map_client, 'map_config_host') ? $map_client->map_config_host : 'maps.eatlas.org.au',
+		'#required' => TRUE
+	);
+
+	$form['map_config_url'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Map configuration URL'),
+		'#description' => t('URL to JSON configuration'),
+		'#default_value' => property_exists($map_client, 'map_config_url') ? $map_client->map_config_url : 'atlasmapper/client/gbrf/config/main.json',
+		'#required' => TRUE
+	);
+
+	$form['parameters'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Map Client parameters'),
 		'#size' => 120,
@@ -188,7 +204,9 @@ function eatlas_map_client_block_view($delta = '') {
 			$map_div_id = 'map_' . check_plain($delta);
 			$block['content'] = array(
 				'#prefix' => '<div class="eatlas-map-client-map-wrapper">',
-				'#markup' => '<div class="eatlas-map-client-map" id="' . $map_div_id . '"></div>',
+				'#markup' => '<div class="eatlas-map-client-map" id="' . $map_div_id . '" '.
+							' data-map-config-host="' . $map_client->map_config_host . '" '.
+							' data-map-config-url="' . $map_client->map_config_url . '"></div>',
 				'#suffix' => '</div>',
 				'#attached' => array(
 					'js' => array(
@@ -222,7 +240,9 @@ function _get_edited_map_client($mcid, $values = array()) {
 		$map_client = new stdClass();
 	}
 
-	$map_client->parameters = $values['eatlas_map_client_parameters'];
+	$map_client->map_config_host = $values['map_config_host'];
+	$map_client->map_config_url = $values['map_config_url'];
+	$map_client->parameters = $values['parameters'];
 
 	return $map_client;
 }
@@ -284,7 +304,7 @@ function eatlas_map_client_load($mcid) {
  */
 function eatlas_map_client_save($map_client_block) {
 	// Transform the object into an Array to be sent to the DB.
-	$map_client_block_fields = (array)$map_client_block;
+	$map_client_block_fields = (array) $map_client_block;
 
 	$mcid = isset($map_client_block_fields['mcid']) ? $map_client_block_fields['mcid'] : NULL;
 

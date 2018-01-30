@@ -6,8 +6,8 @@
 		$('.eatlas-map-client-map').each(function() {
 			var mapClient = new aimsMap.MapClient($(this).attr('id'), {
 				projection: 'EPSG:4326',
-				configUrl: '//maps.eatlas.local/atlasmapper/client/gbrf/config/main.json'
-				// configUrl: '//maps.eatlas.org.au/atlasmapper/client/gbrf/config/main.json'
+				mapConfigHost: $(this).data('map-config-host'),
+				mapConfigURL: $(this).data('map-config-url')
 			});
 			mapClient.init();
 		});

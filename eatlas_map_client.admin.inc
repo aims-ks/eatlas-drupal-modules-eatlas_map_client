@@ -1,7 +1,5 @@
 <?php
-
 include_once('eatlas_map_client.constants.inc');
-
 
 /**
  * Show a list (table) of all the map clients
@@ -57,28 +55,33 @@ function _eatlas_map_client_overview() {
 function _eatlas_map_client_add_form($form, &$form_state, $mcid = NULL) {
 	$form = array();
 
-	$map_client = NULL;
 	if ($mcid !== NULL) {
 		$map_client = eatlas_map_client_load($mcid);
+	} else {
+		$map_client = new stdClass();
 	}
 
 	$form['title'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Block title'),
-		'#description' => t('Map Client name, used in the block name.')
+		'#description' => t('Map Client name, used in the block name.'),
+		'#default_value' => property_exists($map_client, 'title') ? $map_client->title : '',
+		'#required' => TRUE
 	);
 
+	// load map client
 	_eatlas_map_client_add_form_fields($form, $map_client);
-
-	$form['actions'] = array('#type' => 'actions');
-	$form['actions']['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Save')
-	);
-
 	$form['mcid'] = array(
 		'#type' => 'hidden',
 		'#value' => $mcid
+	);
+
+	// define actions
+	$form['actions'] = array('#type' => 'actions');
+
+	$form['actions']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Save')
 	);
 
 	$form['actions']['delete'] = array(

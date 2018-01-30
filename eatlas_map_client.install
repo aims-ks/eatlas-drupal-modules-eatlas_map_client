@@ -3,10 +3,6 @@
 include_once('eatlas_map_client.constants.inc');
 
 /**
- * TODO Verify if library is installed, tell how to install it
- */
-
-/**
  * @return mixed
  */
 function eatlas_map_client_schema() {
@@ -19,6 +15,17 @@ function eatlas_map_client_schema() {
 				'unsigned' => TRUE,
 				'not null' => TRUE
 			),
+			'map_config_host' => array(
+				'description' => 'Host for getting the map configuration.',
+				'type' => 'text',
+				'size' => 'small'
+			),
+			'map_config_url' => array(
+				'description' => 'Map configuration URL.',
+				'type' => 'text',
+				'size' => 'small'
+			),
+
 
 			// This is temporary - we will use this field until we have a good idea of what the map client needs as configuration
 			// The field is expected to be used as a way to store the URL GET parameters of the query used to create a map using the AtlasMapper.
