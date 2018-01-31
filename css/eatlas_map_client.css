@@ -79,7 +79,7 @@
 
 .eatlas-map-client-map {
 	position: relative;
-	height: 100%;
+	height: 50vh;
 }
 
 .eatlas-map-client-map .aims-map-legend {
