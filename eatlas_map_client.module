@@ -238,7 +238,7 @@ function eatlas_map_client_block_view($delta = '') {
 			$block['content'] = array(
 				'#prefix' => '<div class="eatlas-map-client-map-wrapper">',
 				'#markup' => '<div class="eatlas-map-client-map ' . $field_map_banner_type[0]['value'] . '" id="' . $map_div_id . '" data-map-config="' . $json_map_config . '"></div>',
-				'#suffix' => '</div>',
+				'#suffix' => '<a href="' . $field_map_banner[0]['value'] . '" target="_blank" title="Open map to full extent"><img class="open-to-full-extent" src="/' . drupal_get_path('module', 'eatlas_map_client') . '/images/full_extent_icon.jpg" alt="full extend icon" /></a></div>',
 				'#attached' => array(
 					'js' => array(
 						'sites/all/libraries/openlayers/ol.js',

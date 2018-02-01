@@ -77,6 +77,12 @@
 	position: relative;
 }
 
+.eatlas-map-client-map-wrapper .open-to-full-extent {
+	position: absolute;
+	left: 0.1em;
+	top: 5.8em;
+}
+
 .eatlas-map-client-map {
 	position: relative;
 }

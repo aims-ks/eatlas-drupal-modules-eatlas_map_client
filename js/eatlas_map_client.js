@@ -15,6 +15,7 @@
 		});
 
 		mapClient.init()
+			// add layers
 			.then(function () {
 				var baseLayersAPI = mapClient.getBaseLayersAPI();
 				mapConfig.layers.forEach(function(layer) {
@@ -32,6 +33,7 @@
 					}
 				});
 			})
+			// zoom into feature bounding box
 			.then(function() {
 				if (typeof mapConfig.bbox !== 'undefined') {
 					var extent = [mapConfig.bbox.lonMin, mapConfig.bbox.latMin, mapConfig.bbox.lonMax, mapConfig.bbox.latMax];
