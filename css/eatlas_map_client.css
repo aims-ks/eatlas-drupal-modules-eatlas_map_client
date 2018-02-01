@@ -87,15 +87,15 @@
 	position: relative;
 }
 
-.eatlas-map-client-map.small {
+.eatlas-map-client-map.small-map {
 	height: 20vh;
 }
 
-.eatlas-map-client-map.medium {
+.eatlas-map-client-map.medium-map {
 	height: 50vh;
 }
 
-.eatlas-map-client-map.large {
+.eatlas-map-client-map.large-map {
 	height: 90vh;
 }
 
