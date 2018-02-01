@@ -9,6 +9,7 @@ package = eAtlas
 configure = admin/config/eatlas/eatlas_map_client
 
 dependencies[] = eatlas_commons
+dependencies[] = eatlas_spatial_publisher (>=0.29)
 
 
 ; Attributes used by the update module.
