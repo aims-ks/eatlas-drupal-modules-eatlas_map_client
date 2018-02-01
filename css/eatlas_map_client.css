@@ -79,7 +79,18 @@
 
 .eatlas-map-client-map {
 	position: relative;
+}
+
+.eatlas-map-client-map.small {
+	height: 20vh;
+}
+
+.eatlas-map-client-map.medium {
 	height: 50vh;
+}
+
+.eatlas-map-client-map.large {
+	height: 90vh;
 }
 
 .eatlas-map-client-map .aims-map-legend {

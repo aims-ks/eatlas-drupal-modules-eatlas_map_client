@@ -5,3 +5,5 @@ creator = Marc Hammerton
 ;   Those properties are used with release_notes and tags.
 ;   See: https://www.drupal.org/documentation/releases/types
 Bug fixes[] = Issue with panning fixed
+
+New features[] = Use map banner type field for selecting map size

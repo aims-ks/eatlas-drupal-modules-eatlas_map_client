@@ -195,6 +195,10 @@ function eatlas_map_client_block_view($delta = '') {
 	if (!is_array($field_map_banner) || count($field_map_banner) < 1) {
 		return $block;
 	}
+	$field_map_banner_type = field_get_items('node', $node, 'field_map_banner_type');
+	if (!is_array($field_map_banner_type) || count($field_map_banner_type) < 1) {
+		$field_map_banner_type[0]['value'] = 'medium';
+	}
 
 	try {
 		$map_config = _parse_map_banner_url($field_map_banner[0]['value']);
@@ -233,7 +237,7 @@ function eatlas_map_client_block_view($delta = '') {
 			$map_div_id = 'map_' . check_plain($delta);
 			$block['content'] = array(
 				'#prefix' => '<div class="eatlas-map-client-map-wrapper">',
-				'#markup' => '<div class="eatlas-map-client-map" id="' . $map_div_id . '" data-map-config="' . $json_map_config . '"></div>',
+				'#markup' => '<div class="eatlas-map-client-map ' . $field_map_banner_type[0]['value'] . '" id="' . $map_div_id . '" data-map-config="' . $json_map_config . '"></div>',
 				'#suffix' => '</div>',
 				'#attached' => array(
 					'js' => array(
