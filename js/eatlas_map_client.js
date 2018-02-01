@@ -7,7 +7,7 @@
 		var mapConfig = $(mapClientDiv).data('map-config');
 
 		var mapClient = new aimsMap.MapClient($(mapClientDiv).attr('id'), {
-			projection: 'EPSG:4326',
+			projection: mapConfig.projection,
 			centre: mapConfig.centre,
 			zoom: mapConfig.zoom,
 			mapConfigHost: mapConfig.configHost,
@@ -31,7 +31,19 @@
 						overlayLayersAPI.addActiveLayer(layer.id);
 					}
 				});
-				console.log('eAtlas Map Clients successfully loaded');
-		});
+			})
+			.then(function() {
+				if (typeof mapConfig.bbox !== 'undefined') {
+					var extent = [mapConfig.bbox.lonMin, mapConfig.bbox.latMin, mapConfig.bbox.lonMax, mapConfig.bbox.latMax];
+
+					// Transform extent if necessary
+					if (mapConfig.bbox.projection !== mapConfig.projection) {
+						extent = ol.extent.applyTransform(extent, ol.proj.getTransform(mapConfig.bbox.projection, mapConfig.projection));
+					}
+
+					// mapClient.getOlMap().getView().fit(extent);
+					mapClient.getOlMap().getView().fit(extent, {padding: [50, 50, 50, 50]});
+				}
+			});
 	})
 })(jQuery);
