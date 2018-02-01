@@ -66,6 +66,21 @@
 	padding: 15px;
 }
 
+.aims-section-default .aims-section-content p {
+	margin: 0;
+}
+
+/*
+  Modal box overrides
+ */
+#aims-map-add-layer-modal ul.nav {
+	margin-top: 0;
+}
+
+#aims-map-add-layer-modal .tab-content {
+	margin-top: 15px;
+}
+
 /**********************************
 	MAP
  **********************************/
@@ -127,7 +142,7 @@
 .eatlas-map-client-map .aims-map-show-layers-dialog {
 	position: absolute;
 	top: 0;
-	left: 34px;
+	left: 46px;
 	border: 1px solid lightgray;
 	background: white;
 }
