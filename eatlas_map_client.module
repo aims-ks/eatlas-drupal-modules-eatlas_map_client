@@ -271,10 +271,10 @@ function _parse_map_banner_url($map_banner_url) {
 				$map_config['zoom'] = $val;
 				break;
 			case 'll':
-				$map_center = explode(',', $val);
+				$map_centre = explode(',', $val);
 				$map_config['centre'] = array(
-					'longitude' => $map_center[0],
-					'latitude' => $map_center[1]
+					'longitude' => floatval($map_centre[0]),
+					'latitude' => floatval($map_centre[1])
 				);
 				break;
 			case 'l0':
