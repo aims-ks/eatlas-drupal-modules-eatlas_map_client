@@ -79,8 +79,8 @@
 
 .eatlas-map-client-map-wrapper .open-to-full-extent {
 	position: absolute;
-	left: 0.1em;
-	top: 5.8em;
+	left: 0.5em;
+	top: 4.5em;
 }
 
 .eatlas-map-client-map {
@@ -121,7 +121,7 @@
 .eatlas-map-client-map .aims-map-show-layers-button {
 	position: absolute;
 	left: 0.5em;
-	top: 4.5em;
+	top: 6.9em;
 }
 
 .eatlas-map-client-map .aims-map-show-layers-dialog {

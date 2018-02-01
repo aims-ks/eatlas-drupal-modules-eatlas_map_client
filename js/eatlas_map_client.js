@@ -34,7 +34,7 @@
 				});
 			})
 			// zoom into feature bounding box
-			.then(function() {
+			.then(function () {
 				if (typeof mapConfig.bbox !== 'undefined') {
 					var extent = [mapConfig.bbox.lonMin, mapConfig.bbox.latMin, mapConfig.bbox.lonMax, mapConfig.bbox.latMax];
 
