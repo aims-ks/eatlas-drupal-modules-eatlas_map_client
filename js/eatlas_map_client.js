@@ -27,6 +27,7 @@
 
 				var overlayLayersAPI = mapClient.getOverlayLayersAPI();
 				mapConfig.layers.forEach(function(layer) {
+					overlayLayersAPI.setLayerStyle(layer.id, layer.style);
 					overlayLayersAPI.addAvailableLayer(layer.id);
 					if (layer.visible) {
 						overlayLayersAPI.addActiveLayer(layer.id);
