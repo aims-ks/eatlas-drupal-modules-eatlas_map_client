@@ -152,14 +152,28 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		'#required' => TRUE
 	);
 
-	$form['parameters'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Map Client parameters'),
-		'#size' => 120,
-		'#maxlength' => 2048,
-		'#description' => t('[DEVEL] The string of GET parameters that is sent to the AtlasMapper.'),
-		'#default_value' => ($map_client && property_exists($map_client, 'parameters')) ? $map_client->parameters : ''
+	$form['show_button_open_map_url'] = array(
+		'#type' => 'select',
+		'#title' => t('Open map URL button'),
+		'#description' => t('Show the button to open the map banner URL.'),
+		'#default_value' => property_exists($map_client, 'show_button_open_map_url') ? $map_client->show_button_open_map_url : 1,
+		'#options' => array(
+			1 => 'Show',
+			0 => 'Hide'
+		)
 	);
+
+	$form['show_button_select_layers'] = array(
+		'#type' => 'select',
+		'#title' => t('Select layers button'),
+		'#description' => t('Show the button to open the modal to select layers.'),
+		'#default_value' => property_exists($map_client, 'show_button_select_layers') ? $map_client->show_button_select_layers : 1,
+		'#options' => array(
+			1 => 'Show',
+			0 => 'Hide'
+		)
+	);
+
 }
 
 /**
@@ -215,6 +229,8 @@ function eatlas_map_client_block_view($delta = '') {
 			$map_config['projection'] = 'EPSG:4326';
 			$map_config['configHost'] = $map_client->map_config_host;
 			$map_config['configURL'] = $map_client->map_config_url;
+			$map_config['show_button_open_map_url'] = $map_client->show_button_open_map_url === '1' ? true : false;
+			$map_config['show_button_select_layers'] = $map_client->show_button_select_layers === '1' ? true : false;
 
 			$query_parameters = drupal_get_query_parameters();
 			if (isset($query_parameters['rsid']) && isset($query_parameters['featureId'])) {
@@ -232,13 +248,16 @@ function eatlas_map_client_block_view($delta = '') {
 			$block['subject'] = NULL;
 			$block['title'] = '<none>';
 
+			// add a button to open the map banner URL
+			$button_open_map_url = '<div class="open_map_url ol-control"><button type="button" onClick="window.open(\'' . $field_map_banner[0]['value'] . '\')" title="Open map to full extent"><i class="material-icons md-18">zoom_out_map</i></button></div>';
+
 			// Define the rendering of the block
 			// Add library to the block using "#attached"
 			$map_div_id = 'map_' . check_plain($delta);
 			$block['content'] = array(
 				'#prefix' => '<div class="eatlas-map-client-map-wrapper">',
 				'#markup' => '<div class="eatlas-map-client-map ' . $field_map_banner_type[0]['value'] . '-map" id="' . $map_div_id . '" data-map-config="' . $json_map_config . '"></div>',
-				'#suffix' => '<div class="open-to-full-extent ol-control"><button type="button" onClick="window.open(\'' . $field_map_banner[0]['value'] . '\')" title="Open map to full extent"><i class="material-icons md-18">zoom_out_map</i></button></div></div></div>',
+				'#suffix' => '<div class="eatlas-map-client-map-controls-container">' .$button_open_map_url . '</div></div>',
 				'#attached' => array(
 					'js' => array(
 						'sites/all/libraries/openlayers/ol.js',
@@ -344,7 +363,8 @@ function _get_edited_map_client($mcid, $values = array()) {
 
 	$map_client->map_config_host = $values['map_config_host'];
 	$map_client->map_config_url = $values['map_config_url'];
-	$map_client->parameters = $values['parameters'];
+	$map_client->show_button_open_map_url = $values['show_button_open_map_url'];
+	$map_client->show_button_select_layers = $values['show_button_select_layers'];
 
 	return $map_client;
 }

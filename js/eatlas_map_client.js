@@ -33,6 +33,19 @@
 					}
 				});
 			})
+			// arrange controls
+			.then(function() {
+				var $controlsContainer = $('.eatlas-map-client-map-controls-container')[0];
+				if (mapConfig.show_button_select_layers === true) {
+					$('.aims-map-show-layers-button').appendTo($controlsContainer);
+				} else {
+					$('.aims-map-show-layers-button').hide();
+				}
+
+				if (mapConfig.show_button_open_map_url === true) {
+					$('.open_map_url').show();
+				}
+			})
 			// zoom into feature bounding box
 			.then(function () {
 				if (typeof mapConfig.bbox !== 'undefined') {

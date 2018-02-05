@@ -25,15 +25,17 @@ function eatlas_map_client_schema() {
 				'type' => 'text',
 				'size' => 'small'
 			),
-
-
-			// This is temporary - we will use this field until we have a good idea of what the map client needs as configuration
-			// The field is expected to be used as a way to store the URL GET parameters of the query used to create a map using the AtlasMapper.
-			// This is not a good idea, but that's good enough to get started.
-			'parameters' => array(
-				'description' => 'AtlasMapper URL GET parameters.',
-				'type' => 'text',
-				'size' => 'normal' // Up to 16 KB
+			'show_button_open_map_url' => array(
+				'description' => 'Show the button to open the map banner URL.',
+				'type' => 'int',
+				'size' => 'tiny',
+				'default' => 1
+			),
+			'show_button_select_layers' => array(
+				'description' => 'Show the button to open the modal to select layers.',
+				'type' => 'int',
+				'size' => 'tiny',
+				'default' => 1
 			)
 		),
 		'primary key' => array('mcid')
