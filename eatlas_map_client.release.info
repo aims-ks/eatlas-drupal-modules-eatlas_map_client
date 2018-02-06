@@ -8,3 +8,7 @@ Bug fixes[] = Issue with panning fixed
 
 New features[] = Use map banner type field for selecting map size
 New features[] = Add link to open map banner URL in new window/tab
+New features[] = Make show layers and open map banner URL buttons configurable
+New features[] = Enable the usage of layer styles
+New features[] = Adjust styles after moving some to the library
+New features[] = Improve touch device handling
