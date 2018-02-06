@@ -39,6 +39,10 @@
 	flex-direction: column;
 }
 
+.eatlas-map-client-map-wrapper .ol-touch .eatlas-map-client-map-controls-container {
+	top: 5.5em;
+}
+
 .eatlas-map-client-map-wrapper .eatlas-map-client-map-controls-container .ol-control {
 	position: relative;
 	margin-bottom: 0.5em;

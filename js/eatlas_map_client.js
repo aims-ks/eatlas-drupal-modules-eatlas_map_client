@@ -3,10 +3,10 @@
 	$(document).ready(function () {
 		console.log('Loading eAtlas Map Client');
 
-		var mapClientDiv = $('.eatlas-map-client-map')[0];
-		var mapConfig = $(mapClientDiv).data('map-config');
+		var $mapClientDiv = $('.eatlas-map-client-map');
+		var mapConfig = $mapClientDiv.data('map-config');
 
-		var mapClient = new aimsMap.MapClient($(mapClientDiv).attr('id'), {
+		var mapClient = new aimsMap.MapClient($mapClientDiv.attr('id'), {
 			projection: mapConfig.projection,
 			centre: mapConfig.centre,
 			zoom: mapConfig.zoom,
@@ -46,6 +46,8 @@
 				if (mapConfig.show_button_open_map_url === true) {
 					$('.open_map_url').show();
 				}
+
+				$mapClientDiv.find('.ol-viewport').append($controlsContainer);
 			})
 			// zoom into feature bounding box
 			.then(function () {
