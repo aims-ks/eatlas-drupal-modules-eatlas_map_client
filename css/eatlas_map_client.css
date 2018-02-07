@@ -48,6 +48,16 @@
 	margin-bottom: 0.5em;
 }
 
+.eatlas-map-client-map-wrapper .eatlas-map-client-map-controls-container .ol-control button i,
+.eatlas-map-client-map-wrapper .aims-map-legend .ol-control button i,
+.eatlas-map-client-map-wrapper .aims-map-legend-icon.ol-control button i {
+	font-size: inherit;
+}
+
+.eatlas-map-client-map-wrapper .aims-map-legend .legend-item {
+	font-size: 0.8em;
+}
+
 /* initially hide control, show/hide is handled in JS */
 .eatlas-map-client-map-wrapper .eatlas-map-client-map-controls-container .open_map_url {
 	display: none;
