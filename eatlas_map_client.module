@@ -214,6 +214,23 @@ function eatlas_map_client_block_view($delta = '') {
 		$field_map_banner_type[0]['value'] = 'medium';
 	}
 
+	////////////////////////////////////////////////////////////////////////////
+	/// MH, 2018-02-07, hack for displaying the GBRF page as an iframe
+	/// ToDo remove code
+	////////////////////////////////////////////////////////////////////////////
+	if (strpos($field_map_banner[0]['value'], '/gbrf-rr/index.html') > 0) {
+		$block['subject'] = NULL;
+		$block['title'] = '<none>';
+
+		$block['content'] = array(
+			'#markup' => '<iframe class="eatlas-map-client-map ' . $field_map_banner_type[0]['value'] . '-map" style="display: block; border: 0; width: 100%;" src="' . $field_map_banner[0]['value'] . '" frameborder="0"></iframe>',
+			'#attached' => array(
+				'css' => array(drupal_get_path('module', 'eatlas_map_client') . '/css/eatlas_map_client.css')
+			)
+		);
+		return $block;
+	}
+
 	try {
 		$map_config = _parse_map_banner_url($field_map_banner[0]['value']);
 	} catch (Exception $exception) {
@@ -287,37 +304,39 @@ function _parse_map_banner_url($map_banner_url) {
 	$layer_visibilities = array();
 	$layer_styles = array();
 	foreach (explode('&', $query_string) as $parameter) {
-		list ($key, $val) = explode('=', $parameter);
+		if (strpos($parameter, '=')) {
+			list ($key, $val) = explode('=', $parameter);
 
-		switch ($key) {
-			case 'z':
-				$map_config['zoom'] = $val;
-				break;
-			case 'll':
-				$map_centre = explode(',', $val);
-				$map_config['centre'] = array(
-					'longitude' => floatval($map_centre[0]),
-					'latitude' => floatval($map_centre[1])
-				);
-				break;
-			case 'l0':
-				$layers = explode(',', $val);
-				foreach ($layers as $layer) {
-					$map_config['layers'][] = array(
-						'id' => urldecode($layer),
-						'visible' => TRUE,
-						'style' => ''
+			switch ($key) {
+				case 'z':
+					$map_config['zoom'] = $val;
+					break;
+				case 'll':
+					$map_centre = explode(',', $val);
+					$map_config['centre'] = array(
+						'longitude' => floatval($map_centre[0]),
+						'latitude' => floatval($map_centre[1])
 					);
-				}
-				break;
-			case 'v0':
-				$layer_visibilities = explode(',', $val);
-				break;
-			case 's0':
-				$layer_styles = explode(',', $val);
-				break;
-			default:
-				break;
+					break;
+				case 'l0':
+					$layers = explode(',', $val);
+					foreach ($layers as $layer) {
+						$map_config['layers'][] = array(
+							'id' => urldecode($layer),
+							'visible' => TRUE,
+							'style' => ''
+						);
+					}
+					break;
+				case 'v0':
+					$layer_visibilities = explode(',', $val);
+					break;
+				case 's0':
+					$layer_styles = explode(',', $val);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
