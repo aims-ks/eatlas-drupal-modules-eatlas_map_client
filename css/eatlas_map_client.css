@@ -48,6 +48,10 @@
 	margin-bottom: 0.5em;
 }
 
+.eatlas-map-client-map-wrapper .aims-map-legend {
+	max-width: 300px !important;
+}
+
 .eatlas-map-client-map-wrapper .aims-map-legend .legend-item {
 	font-size: 0.8em;
 }
