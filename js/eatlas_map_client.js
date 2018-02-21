@@ -3,6 +3,10 @@
 	$(document).ready(function () {
 		console.log('Loading eAtlas Map Client');
 
+		// declare namespace for map client
+		window.eatlasMapClient = {};
+		window.eatlasMapClient.instances = {};
+
 		var $mapClientDiv = $('.eatlas-map-client-map');
 		var mapConfig = $mapClientDiv.data('map-config');
 
@@ -13,6 +17,9 @@
 			mapConfigHost: mapConfig.configHost,
 			mapConfigURL: mapConfig.configUrl
 		});
+
+		// make this client globally accessible
+		window.eatlasMapClient.instances[$mapClientDiv.attr('id')] = mapClient;
 
 		mapClient.init()
 			// add layers
@@ -63,5 +70,7 @@
 					mapClient.getOlMap().getView().fit(extent, {padding: [50, 50, 50, 50]});
 				}
 			});
+
+		$mapClientDiv.mappClient = mapClient;
 	})
 })(jQuery);
