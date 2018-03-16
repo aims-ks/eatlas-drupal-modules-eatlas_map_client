@@ -65,3 +65,16 @@
 	left: auto;
 	top: auto;
 }
+
+/* Modal box overrides */
+@media (min-width: 576px) {
+	body div.modal-dialog {
+		margin: 0.5rem;
+	}
+}
+@media (min-width: 676px) {
+	body div.modal-dialog {
+		max-width: 600px !important;
+		margin: 1.75rem auto;
+	}
+}
