@@ -15,7 +15,8 @@
 			centre: mapConfig.centre,
 			zoom: mapConfig.zoom,
 			mapConfigHost: mapConfig.configHost,
-			mapConfigURL: mapConfig.configUrl
+			mapConfigURL: mapConfig.configUrl,
+			disableShowLayers: mapConfig.disableShowLayers
 		});
 
 		// make this client globally accessible
@@ -41,20 +42,19 @@
 					}
 				});
 			})
-			// arrange controls
+			// add custom controls
 			.then(function() {
-				var $controlsContainer = $('.eatlas-map-client-map-controls-container')[0];
-				if (mapConfig.show_button_select_layers === true) {
-					$('.aims-map-show-layers-button').appendTo($controlsContainer);
-				} else {
-					$('.aims-map-show-layers-button').hide();
+				if (mapConfig.showButtonOpenMapUrl === true) {
+					mapClient.getUserInterfaceAPI().getLeftControlsPanel().createButton(
+						'open_map_url ol-control',
+						'Open map to full extent',
+						'zoom_out_map',
+						function() {
+							window.open($mapClientDiv.data('map-banner-url'));
+						},
+						null
+					);
 				}
-
-				if (mapConfig.show_button_open_map_url === true) {
-					$('.open_map_url').show();
-				}
-
-				$mapClientDiv.find('.ol-viewport').append($controlsContainer);
 			})
 			// zoom into feature bounding box
 			.then(function () {

@@ -28,44 +28,6 @@
 	height: 90vh;
 }
 
-/*
-  Controls
- */
-.eatlas-map-client-map-wrapper .eatlas-map-client-map-controls-container {
-	position: absolute;
-	left: 0.5em;
-	top: 4.5em;
-	display: flex;
-	flex-direction: column;
-}
-
-.eatlas-map-client-map-wrapper .ol-touch .eatlas-map-client-map-controls-container {
-	top: 5.5em;
-}
-
-.eatlas-map-client-map-wrapper .eatlas-map-client-map-controls-container .ol-control {
-	position: relative;
-	margin-bottom: 0.5em;
-}
-
-.eatlas-map-client-map-wrapper .aims-map-legend {
-	max-width: 300px !important;
-}
-
-.eatlas-map-client-map-wrapper .aims-map-legend .legend-item {
-	font-size: 0.8em;
-}
-
-/* initially hide control, show/hide is handled in JS */
-.eatlas-map-client-map-wrapper .eatlas-map-client-map-controls-container .open_map_url {
-	display: none;
-}
-
-.eatlas-map-client-map-wrapper .eatlas-map-client-map-controls-container .aims-map-show-layers-button {
-	left: auto;
-	top: auto;
-}
-
 /* Modal box overrides */
 @media (min-width: 576px) {
 	body div.modal-dialog {
