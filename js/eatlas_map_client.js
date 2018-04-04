@@ -16,7 +16,8 @@
 			zoom: mapConfig.zoom,
 			mapConfigHost: mapConfig.configHost,
 			mapConfigURL: mapConfig.configUrl,
-			disableShowLayers: mapConfig.disableShowLayers
+			disableShowLayers: mapConfig.disableShowLayers,
+			disableFeatureRequests: mapConfig.disableFeatureRequests
 		});
 
 		// make this client globally accessible

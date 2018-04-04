@@ -166,8 +166,19 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 	$form['show_button_select_layers'] = array(
 		'#type' => 'select',
 		'#title' => t('Select layers button'),
-		'#description' => t('Show the button to open the modal to select layers.'),
+		'#description' => t('Show the button to open the select layers dialog.'),
 		'#default_value' => property_exists($map_client, 'show_button_select_layers') ? $map_client->show_button_select_layers : 1,
+		'#options' => array(
+			1 => 'Show',
+			0 => 'Hide'
+		)
+	);
+
+	$form['show_button_feature_requests'] = array(
+		'#type' => 'select',
+		'#title' => t('Feature requests button'),
+		'#description' => t('Show the button for feature requests.'),
+		'#default_value' => property_exists($map_client, 'show_button_feature_requests') ? $map_client->show_button_feature_requests : 1,
 		'#options' => array(
 			1 => 'Show',
 			0 => 'Hide'
@@ -248,6 +259,7 @@ function eatlas_map_client_block_view($delta = '') {
 			$map_config['configURL'] = $map_client->map_config_url;
 			$map_config['showButtonOpenMapUrl'] = $map_client->show_button_open_map_url === '1' ? true : false;
 			$map_config['disableShowLayers'] = $map_client->show_button_select_layers === '1' ? false : true;
+			$map_config['disableFeatureRequests'] = $map_client->show_button_feature_requests === '1' ? false : true;
 
 			$query_parameters = drupal_get_query_parameters();
 			if (isset($query_parameters['rsid']) && isset($query_parameters['featureId'])) {
@@ -381,6 +393,7 @@ function _get_edited_map_client($mcid, $values = array()) {
 	$map_client->map_config_url = $values['map_config_url'];
 	$map_client->show_button_open_map_url = $values['show_button_open_map_url'];
 	$map_client->show_button_select_layers = $values['show_button_select_layers'];
+	$map_client->show_button_feature_requests = $values['show_button_feature_requests'];
 
 	return $map_client;
 }
