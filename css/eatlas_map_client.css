@@ -27,6 +27,11 @@
 .eatlas-map-client-map.large-map {
 	height: 90vh;
 }
+@media (min-width: 768px) {
+	.eatlas-map-client-map .aims-map-ui-container .aims-map-side-bar {
+		max-width: 350px !important;
+	}
+}
 
 /* Modal box overrides */
 @media (min-width: 576px) {
