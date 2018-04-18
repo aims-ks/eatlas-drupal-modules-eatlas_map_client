@@ -17,7 +17,8 @@
 			mapConfigHost: mapConfig.configHost,
 			mapConfigURL: mapConfig.configUrl,
 			disableShowLayers: mapConfig.disableShowLayers,
-			disableFeatureRequests: mapConfig.disableFeatureRequests
+			disableFeatureRequests: mapConfig.disableFeatureRequests,
+			featureRequestsResultsPosition: mapConfig.featureRequestsResultsPosition
 		});
 
 		// make this client globally accessible

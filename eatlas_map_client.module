@@ -163,25 +163,38 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		)
 	);
 
-	$form['show_button_select_layers'] = array(
+	$form['enable_select_layers'] = array(
 		'#type' => 'select',
-		'#title' => t('Select layers button'),
-		'#description' => t('Show the button to open the select layers dialog.'),
-		'#default_value' => property_exists($map_client, 'show_button_select_layers') ? $map_client->show_button_select_layers : 1,
+		'#title' => t('Select layers'),
+		'#description' => t('Enable the select layers dialog.'),
+		'#default_value' => property_exists($map_client, 'enable_select_layers') ? $map_client->enable_select_layers : 1,
 		'#options' => array(
-			1 => 'Show',
-			0 => 'Hide'
+			1 => 'On',
+			0 => 'Off'
 		)
 	);
 
-	$form['show_button_feature_requests'] = array(
+	$form['enable_feature_requests'] = array(
 		'#type' => 'select',
-		'#title' => t('Feature requests button'),
-		'#description' => t('Show the button for feature requests.'),
-		'#default_value' => property_exists($map_client, 'show_button_feature_requests') ? $map_client->show_button_feature_requests : 1,
+		'#title' => t('Feature requests'),
+		'#description' => t('Enable feature requests.'),
+		'#default_value' => property_exists($map_client, 'enable_feature_requests') ? $map_client->enable_feature_requests : 1,
 		'#options' => array(
-			1 => 'Show',
-			0 => 'Hide'
+			1 => 'On',
+			0 => 'Off'
+		)
+	);
+
+	$form['feature_requests_results_position'] = array(
+		'#type' => 'select',
+		'#title' => t('Feature requests result position'),
+		'#description' => t('Define where the results of the feature requests should be shown.'),
+		'#default_value' => property_exists($map_client, 'feature_requests_results_position') ? $map_client->feature_requests_results_position : 1,
+		'#options' => array(
+			1 => 'Right',
+			2 => 'Bottom',
+			3 => 'Left',
+			4 => 'Top',
 		)
 	);
 
@@ -258,8 +271,24 @@ function eatlas_map_client_block_view($delta = '') {
 			$map_config['configHost'] = $map_client->map_config_host;
 			$map_config['configURL'] = $map_client->map_config_url;
 			$map_config['showButtonOpenMapUrl'] = $map_client->show_button_open_map_url === '1' ? true : false;
-			$map_config['disableShowLayers'] = $map_client->show_button_select_layers === '1' ? false : true;
-			$map_config['disableFeatureRequests'] = $map_client->show_button_feature_requests === '1' ? false : true;
+			$map_config['disableShowLayers'] = $map_client->enable_select_layers === '1' ? false : true;
+			$map_config['disableFeatureRequests'] = $map_client->enable_feature_requests === '1' ? false : true;
+
+			switch ($map_client->feature_requests_results_position) {
+				case '4':
+					$map_config['featureRequestsResultsPosition'] = 'top';
+					break;
+				case '3':
+					$map_config['featureRequestsResultsPosition'] = 'left';
+					break;
+				case '2':
+					$map_config['featureRequestsResultsPosition'] = 'bottom';
+					break;
+				case '1':
+				default:
+					$map_config['featureRequestsResultsPosition'] = 'right';
+					break;
+			}
 
 			$query_parameters = drupal_get_query_parameters();
 			if (isset($query_parameters['rsid']) && isset($query_parameters['featureId'])) {
@@ -392,8 +421,9 @@ function _get_edited_map_client($mcid, $values = array()) {
 	$map_client->map_config_host = $values['map_config_host'];
 	$map_client->map_config_url = $values['map_config_url'];
 	$map_client->show_button_open_map_url = $values['show_button_open_map_url'];
-	$map_client->show_button_select_layers = $values['show_button_select_layers'];
-	$map_client->show_button_feature_requests = $values['show_button_feature_requests'];
+	$map_client->enable_select_layers = $values['enable_select_layers'];
+	$map_client->enable_feature_requests = $values['enable_feature_requests'];
+	$map_client->feature_requests_results_position = $values['feature_requests_results_position'];
 
 	return $map_client;
 }

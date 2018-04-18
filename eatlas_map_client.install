@@ -31,14 +31,20 @@ function eatlas_map_client_schema() {
 				'size' => 'tiny',
 				'default' => 1
 			),
-			'show_button_select_layers' => array(
-				'description' => 'Show the button to open the modal to select layers.',
+			'enable_select_layers' => array(
+				'description' => 'Enable feature for selecting layers.',
 				'type' => 'int',
 				'size' => 'tiny',
 				'default' => 1
 			),
-			'show_button_feature_requests' => array(
-				'description' => 'Show the button for feature requests.',
+			'enable_feature_requests' => array(
+				'description' => 'Enable feature requests.',
+				'type' => 'int',
+				'size' => 'tiny',
+				'default' => 1
+			),
+			'feature_requests_results_position' => array(
+				'description' => 'Define where the results of the feature requests should be shown. Values: right => 1, bottom => 2, left => 3, top => 4',
 				'type' => 'int',
 				'size' => 'tiny',
 				'default' => 1
@@ -73,8 +79,38 @@ function eatlas_map_client_schema() {
  * Add show-feature-request field. (7.x-0.4)
  */
 function eatlas_map_client_update_7001(&$sandbox) {
-	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_feature_requests')) {
+	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_feature_requests')) {
 		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
-		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_feature_requests', $schema['fields']['show_button_feature_requests']);
+		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_feature_requests', $schema['fields']['enable_feature_requests']);
+	}
+}
+
+/**
+ * Add feature_requests_results_position field. (7.x-0.4)
+ */
+function eatlas_map_client_update_7002(&$sandbox) {
+	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'feature_requests_results_position')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
+		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'feature_requests_results_position', $schema['fields']['feature_requests_results_position']);
+	}
+}
+
+/**
+ * Rename field show_button_select_layers to enable_select_layers. (7.x-0.4)
+ */
+function eatlas_map_client_update_7003(&$sandbox) {
+	if (db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_select_layers')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
+		db_change_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_select_layers', 'enable_select_layers', $schema['fields']['enable_select_layers']);
+	}
+}
+
+/**
+ * Rename field show_button_feature_requests to enable_feature_requests. (7.x-0.4)
+ */
+function eatlas_map_client_update_7004(&$sandbox) {
+	if (db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_feature_requests')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
+		db_change_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_feature_requests', 'enable_feature_requests', $schema['fields']['enable_feature_requests']);
 	}
 }

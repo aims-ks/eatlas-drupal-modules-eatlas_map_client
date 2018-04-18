@@ -31,6 +31,10 @@
 	.eatlas-map-client-map .aims-map-ui-container .aims-map-side-bar {
 		max-width: 350px !important;
 	}
+
+	.eatlas-map-client-map .aims-map-ui-container .aims-map-ui-row-container .aims-map-row-panel {
+		max-width: 720px !important;
+	}
 }
 
 /* Modal box overrides */
