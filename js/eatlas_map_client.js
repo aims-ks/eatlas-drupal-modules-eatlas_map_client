@@ -18,7 +18,11 @@
 			mapConfigURL: mapConfig.configUrl,
 			disableShowLayers: mapConfig.disableShowLayers,
 			disableFeatureRequests: mapConfig.disableFeatureRequests,
-			featureRequestsResultsPosition: mapConfig.featureRequestsResultsPosition
+			featureRequestsResultsPosition: mapConfig.featureRequestsResultsPosition,
+			featureRequestsWmsParams: {
+				BUFFER: 20,
+				FEATURE_COUNT: 2
+			}
 		});
 
 		// make this client globally accessible
