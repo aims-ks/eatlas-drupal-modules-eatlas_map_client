@@ -4,7 +4,6 @@ creator = Marc Hammerton
 ;   This variable is an array, one cell per element. Use "\n" for new lines.
 ;   Those properties are used with release_notes and tags.
 ;   See: https://www.drupal.org/documentation/releases/types
-Bug fixes[] = Do not show map when map banner type is none
 
-New features[] = Add global access to map client instance
+New features[] = Use mapping client v1.1.0 (feature popups, layer settings)
 
