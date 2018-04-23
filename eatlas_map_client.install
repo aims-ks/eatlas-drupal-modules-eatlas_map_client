@@ -28,26 +28,22 @@ function eatlas_map_client_schema() {
 			'show_button_open_map_url' => array(
 				'description' => 'Show the button to open the map banner URL.',
 				'type' => 'int',
-				'size' => 'tiny',
-				'default' => 1
+				'size' => 'tiny'
 			),
 			'enable_select_layers' => array(
 				'description' => 'Enable feature for selecting layers.',
 				'type' => 'int',
-				'size' => 'tiny',
-				'default' => 1
+				'size' => 'tiny'
 			),
 			'enable_feature_requests' => array(
 				'description' => 'Enable feature requests.',
 				'type' => 'int',
-				'size' => 'tiny',
-				'default' => 1
+				'size' => 'tiny'
 			),
 			'feature_requests_results_position' => array(
 				'description' => 'Define where the results of the feature requests should be shown. Values: right => 1, bottom => 2, left => 3, top => 4',
 				'type' => 'int',
-				'size' => 'tiny',
-				'default' => 1
+				'size' => 'tiny'
 			)
 		),
 		'primary key' => array('mcid')

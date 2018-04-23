@@ -21,7 +21,7 @@
 			featureRequestsResultsPosition: mapConfig.featureRequestsResultsPosition,
 			featureRequestsWmsParams: {
 				BUFFER: 20,
-				FEATURE_COUNT: 2
+				FEATURE_COUNT: 1
 			}
 		});
 
