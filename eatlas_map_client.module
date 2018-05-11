@@ -198,6 +198,19 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		)
 	);
 
+	$form['default_active_component'] = array(
+		'#type' => 'select',
+		'#title' => t('Default active component'),
+		'#description' => t('Define which component should be activated by default.'),
+		'#default_value' => property_exists($map_client, 'default_active_component') ? $map_client->default_active_component : '',
+		'#options' => array(
+			'' => 'None',
+			'legend' => 'Legend',
+			'showLayers' => 'Select layers',
+			'getFeatureInfo' => 'Get feature information'
+		)
+	);
+
 }
 
 /**
@@ -273,6 +286,7 @@ function eatlas_map_client_block_view($delta = '') {
 			$map_config['showButtonOpenMapUrl'] = $map_client->show_button_open_map_url === '1' ? true : false;
 			$map_config['disableShowLayers'] = $map_client->enable_select_layers === '1' ? false : true;
 			$map_config['disableFeatureRequests'] = $map_client->enable_feature_requests === '1' ? false : true;
+			$map_config['defaultActiveComponent'] = $map_client->default_active_component;
 
 			switch ($map_client->feature_requests_results_position) {
 				case '4':
@@ -424,6 +438,7 @@ function _get_edited_map_client($mcid, $values = array()) {
 	$map_client->enable_select_layers = $values['enable_select_layers'];
 	$map_client->enable_feature_requests = $values['enable_feature_requests'];
 	$map_client->feature_requests_results_position = $values['feature_requests_results_position'];
+	$map_client->default_active_component = $values['default_active_component'];
 
 	return $map_client;
 }

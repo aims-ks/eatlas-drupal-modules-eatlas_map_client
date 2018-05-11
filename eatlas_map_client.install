@@ -44,6 +44,11 @@ function eatlas_map_client_schema() {
 				'description' => 'Define where the results of the feature requests should be shown. Values: right => 1, bottom => 2, left => 3, top => 4',
 				'type' => 'int',
 				'size' => 'tiny'
+			),
+			'default_active_component' => array(
+				'description' => 'Define which component should be activated by default',
+				'type' => 'text',
+				'size' => 'small'
 			)
 		),
 		'primary key' => array('mcid')
@@ -108,5 +113,15 @@ function eatlas_map_client_update_7004(&$sandbox) {
 	if (db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_feature_requests')) {
 		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
 		db_change_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_feature_requests', 'enable_feature_requests', $schema['fields']['enable_feature_requests']);
+	}
+}
+
+/**
+ * Add default_active_component field. (7.x-0.4)
+ */
+function eatlas_map_client_update_7005(&$sandbox) {
+	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'default_active_component')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
+		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'default_active_component', $schema['fields']['default_active_component']);
 	}
 }
