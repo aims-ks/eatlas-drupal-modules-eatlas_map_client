@@ -52,16 +52,36 @@
 			// add custom controls
 			.then(function() {
 				if (mapConfig.showButtonOpenMapUrl === true) {
-					mapClient.getUserInterfaceAPI().getLeftControlsPanel().createButton(
-						'open_map_url ol-control',
+					var openMapUrlButton = mapClient.getUserInterfaceAPI().getLeftControlsPanel().createButton(
+						'open_map_url',
 						'Open map to full extent',
 						'zoom_out_map',
-						function() {
-							window.open($mapClientDiv.data('map-banner-url'));
-						},
-						null
+						null,
+						false
 					);
+					openMapUrlButton.on(openMapUrlButton.EVENT_CLICKED, function() {
+					  window.open($mapClientDiv.data('map-banner-url'));
+					});
 				}
+
+				var expandButton = mapClient.getUserInterfaceAPI().getLeftControlsPanel().createButton(
+				  'open_map_fullscreen',
+          'Open map to full extent',
+          'fullscreen',
+          null,
+          true
+        );
+
+        expandButton.on(expandButton.EVENT_CLICKED, function() {
+          $mapClientDiv.toggleClass('medium-map');
+          $mapClientDiv.toggleClass('large-map');
+          if ($mapClientDiv.hasClass('large-map')) {
+            $mapClientDiv.find('.aims-map-controls-panel.left .open_map_fullscreen i').html('fullscreen_exit');
+          } else {
+            $mapClientDiv.find('.aims-map-controls-panel.left .open_map_fullscreen i').html('fullscreen');
+          }
+          mapClient.getOlMap().updateSize();
+        });
 			})
 			// zoom into feature bounding box
 			.then(function () {
