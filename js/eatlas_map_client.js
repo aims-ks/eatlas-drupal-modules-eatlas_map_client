@@ -56,7 +56,6 @@
 						'open_map_url',
 						'Open map to full extent',
 						'zoom_out_map',
-						null,
 						false
 					);
 					openMapUrlButton.on(openMapUrlButton.EVENT_CLICKED, function() {
@@ -64,21 +63,21 @@
 					});
 				}
 
-				var expandButton = mapClient.getUserInterfaceAPI().getLeftControlsPanel().createButton(
+				var expandButton = mapClient.getUserInterfaceAPI().getRightControlsPanel().createButton(
 				  'open_map_fullscreen',
           'Open map to full extent',
           'fullscreen',
-          null,
-          true
+          false,
+          'top'
         );
 
         expandButton.on(expandButton.EVENT_CLICKED, function() {
           $mapClientDiv.toggleClass('medium-map');
           $mapClientDiv.toggleClass('large-map');
           if ($mapClientDiv.hasClass('large-map')) {
-            $mapClientDiv.find('.aims-map-controls-panel.left .open_map_fullscreen i').html('fullscreen_exit');
+            $mapClientDiv.find('.aims-map-controls-panel .open_map_fullscreen i').html('fullscreen_exit');
           } else {
-            $mapClientDiv.find('.aims-map-controls-panel.left .open_map_fullscreen i').html('fullscreen');
+            $mapClientDiv.find('.aims-map-controls-panel .open_map_fullscreen i').html('fullscreen');
           }
           mapClient.getOlMap().updateSize();
         });

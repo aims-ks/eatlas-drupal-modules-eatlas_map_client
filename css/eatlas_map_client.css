@@ -14,7 +14,6 @@
  */
 .eatlas-map-client-map {
 	position: relative;
-  box-shadow: 0 0 8px #666666;
 }
 
 .eatlas-map-client-map.small-map {
