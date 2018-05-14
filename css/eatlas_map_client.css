@@ -53,6 +53,7 @@
 /*
   Special styles for buttons
  */
-.open_map_fullscreen i {
-  font-weight: bold;
+.aims-map-ui-container .open_map_fullscreen i.material-icons {
+  font-size: 1.0em;
+  line-height: 1.5em;
 }
