@@ -63,24 +63,34 @@
 					});
 				}
 
-				var expandButton = mapClient.getUserInterfaceAPI().getRightControlsPanel().createButton(
-				  'open_map_fullscreen',
-          'Open map to full extent',
-          'fullscreen',
-          false,
-          'top'
-        );
+				var mapSizeClass = '';
+				if ($mapClientDiv.hasClass('medium-map')) {
+          mapSizeClass = 'medium-map';
+        } else if ($mapClientDiv.hasClass('small-map')) {
+          mapSizeClass = 'small-map';
+        }
 
-        expandButton.on(expandButton.EVENT_CLICKED, function() {
-          $mapClientDiv.toggleClass('medium-map');
-          $mapClientDiv.toggleClass('large-map');
-          if ($mapClientDiv.hasClass('large-map')) {
-            $mapClientDiv.find('.aims-map-controls-panel .open_map_fullscreen i').html('fullscreen_exit');
-          } else {
-            $mapClientDiv.find('.aims-map-controls-panel .open_map_fullscreen i').html('fullscreen');
-          }
-          mapClient.getOlMap().updateSize();
-        });
+        // only add expand-button when it is either a medium or small map
+        if (mapSizeClass !== '') {
+          var expandButton = mapClient.getUserInterfaceAPI().getRightControlsPanel().createButton(
+            'open_map_fullscreen',
+            'Open map to full extent',
+            'fullscreen',
+            false,
+            'top'
+          );
+
+          expandButton.on(expandButton.EVENT_CLICKED, function() {
+            $mapClientDiv.toggleClass(mapSizeClass);
+            $mapClientDiv.toggleClass('large-map');
+            if ($mapClientDiv.hasClass('large-map')) {
+              $mapClientDiv.find('.aims-map-controls-panel .open_map_fullscreen i').html('fullscreen_exit');
+            } else {
+              $mapClientDiv.find('.aims-map-controls-panel .open_map_fullscreen i').html('fullscreen');
+            }
+            mapClient.getOlMap().updateSize();
+          });
+        }
 			})
 			// zoom into feature bounding box
 			.then(function () {
