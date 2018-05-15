@@ -35,6 +35,11 @@ function eatlas_map_client_schema() {
 				'type' => 'int',
 				'size' => 'tiny'
 			),
+			'enable_metadata' => array(
+				'description' => 'Enable feature for showing metadata.',
+				'type' => 'int',
+				'size' => 'tiny'
+			),
 			'enable_feature_requests' => array(
 				'description' => 'Enable feature requests.',
 				'type' => 'int',
@@ -124,4 +129,14 @@ function eatlas_map_client_update_7005(&$sandbox) {
 		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
 		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'default_active_component', $schema['fields']['default_active_component']);
 	}
+}
+
+/**
+ * Add enable_metadata field. (7.x-0.4)
+ */
+function eatlas_map_client_update_7006(&$sandbox) {
+  if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_metadata')) {
+    $schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
+    db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_metadata', $schema['fields']['enable_metadata']);
+  }
 }

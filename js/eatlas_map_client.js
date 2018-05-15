@@ -17,6 +17,7 @@
 			mapConfigHost: mapConfig.configHost,
 			mapConfigURL: mapConfig.configUrl,
 			disableShowLayers: mapConfig.disableShowLayers,
+			disableMetadata: mapConfig.disableMetadata,
 			disableFeatureRequests: mapConfig.disableFeatureRequests,
 			featureRequestsResultsPosition: mapConfig.featureRequestsResultsPosition,
 			featureRequestsWmsParams: {

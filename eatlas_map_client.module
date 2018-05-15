@@ -174,6 +174,17 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		)
 	);
 
+	$form['enable_metadata'] = array(
+		'#type' => 'select',
+		'#title' => t('Show metadata'),
+		'#description' => t('Enable the metadata feature.'),
+		'#default_value' => property_exists($map_client, 'enable_metadata') ? $map_client->enable_metadata : 1,
+		'#options' => array(
+			1 => 'On',
+			0 => 'Off'
+		)
+	);
+
 	$form['enable_feature_requests'] = array(
 		'#type' => 'select',
 		'#title' => t('Feature requests'),
@@ -207,7 +218,8 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 			'' => 'None',
 			'legend' => 'Legend',
 			'showLayers' => 'Select layers',
-			'getFeatureInfo' => 'Get feature information'
+			'getFeatureInfo' => 'Get feature information',
+      'metadata' => 'Metadata'
 		)
 	);
 
@@ -285,6 +297,7 @@ function eatlas_map_client_block_view($delta = '') {
 			$map_config['configURL'] = $map_client->map_config_url;
 			$map_config['showButtonOpenMapUrl'] = $map_client->show_button_open_map_url === '1' ? true : false;
 			$map_config['disableShowLayers'] = $map_client->enable_select_layers === '1' ? false : true;
+			$map_config['disableMetadata'] = $map_client->enable_metadata === '1' ? false : true;
 			$map_config['disableFeatureRequests'] = $map_client->enable_feature_requests === '1' ? false : true;
 			$map_config['defaultActiveComponent'] = $map_client->default_active_component;
 
@@ -436,6 +449,7 @@ function _get_edited_map_client($mcid, $values = array()) {
 	$map_client->map_config_url = $values['map_config_url'];
 	$map_client->show_button_open_map_url = $values['show_button_open_map_url'];
 	$map_client->enable_select_layers = $values['enable_select_layers'];
+	$map_client->enable_metadata = $values['enable_metadata'];
 	$map_client->enable_feature_requests = $values['enable_feature_requests'];
 	$map_client->feature_requests_results_position = $values['feature_requests_results_position'];
 	$map_client->default_active_component = $values['default_active_component'];
