@@ -29,11 +29,11 @@
 }
 @media (min-width: 768px) {
 	.eatlas-map-client-map .aims-map-ui-container .aims-map-side-bar {
-		max-width: 350px !important;
+		max-width: 350px;
 	}
 
 	.eatlas-map-client-map .aims-map-ui-container .aims-map-ui-row-container .aims-map-row-panel {
-		max-width: 720px !important;
+		max-width: 720px;
 	}
 }
 
