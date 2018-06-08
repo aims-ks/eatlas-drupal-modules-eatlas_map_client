@@ -43,7 +43,10 @@
 
 				var overlayLayersAPI = mapClient.getOverlayLayersAPI();
 				mapConfig.layers.forEach(function(layer) {
-					overlayLayersAPI.setLayerStyle(layer.id, layer.style);
+					overlayLayersAPI.setLayerProperty(layer.id, 'style', layer.style);
+					if (layer.hasOwnProperty('opacity')) {
+            overlayLayersAPI.setLayerProperty(layer.id, 'opacity', layer.opacity);
+          }
 					overlayLayersAPI.addAvailableLayer(layer.id);
 					if (layer.visible) {
 						overlayLayersAPI.addActiveLayer(layer.id);

@@ -368,6 +368,7 @@ function _parse_map_banner_url($map_banner_url) {
 	$map_config['layers'] = array();
 	$layer_visibilities = array();
 	$layer_styles = array();
+	$layer_opacity = array();
 	foreach (explode('&', $query_string) as $parameter) {
 		if (strpos($parameter, '=')) {
 			list ($key, $val) = explode('=', $parameter);
@@ -399,6 +400,9 @@ function _parse_map_banner_url($map_banner_url) {
 				case 's0':
 					$layer_styles = explode(',', $val);
 					break;
+        case 'o0':
+          $layer_opacity = explode(',', $val);
+          break;
 				default:
 					break;
 			}
@@ -423,6 +427,15 @@ function _parse_map_banner_url($map_banner_url) {
 			}
 		}
 	}
+
+  // update layer opacity
+  foreach ($layer_opacity as $key => $opacity) {
+    if (isset($map_config['layers'][$key])) {
+      if ($opacity != '') {
+        $map_config['layers'][$key]['opacity'] = $opacity;
+      }
+    }
+  }
 
 	// finally reverse array to have the correct order for displaying layers on top of each other
 	$map_config['layers'] = array_reverse($map_config['layers']);
