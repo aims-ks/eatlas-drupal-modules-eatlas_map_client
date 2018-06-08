@@ -50,11 +50,3 @@
 		margin: 1.75rem auto;
 	}
 }
-
-/*
-  Special styles for buttons
- */
-.aims-map-ui-container .open_map_fullscreen i.material-icons {
-  font-size: 1.0em;
-  line-height: 1.5em;
-}
