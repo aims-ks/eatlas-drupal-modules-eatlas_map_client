@@ -400,9 +400,9 @@ function _parse_map_banner_url($map_banner_url) {
 				case 's0':
 					$layer_styles = explode(',', $val);
 					break;
-        case 'o0':
-          $layer_opacity = explode(',', $val);
-          break;
+				case 'o0':
+					$layer_opacity = explode(',', $val);
+					break;
 				default:
 					break;
 			}
