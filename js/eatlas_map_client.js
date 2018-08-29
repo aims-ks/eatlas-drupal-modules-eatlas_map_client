@@ -24,7 +24,7 @@
 				BUFFER: 20,
 				FEATURE_COUNT: 1
 			},
-      		defaultActiveComponent: mapConfig.defaultActiveComponent
+			defaultActiveComponent: mapConfig.defaultActiveComponent
 		});
 
 		// make this client globally accessible
