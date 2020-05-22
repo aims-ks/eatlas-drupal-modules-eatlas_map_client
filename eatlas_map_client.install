@@ -25,6 +25,11 @@ function eatlas_map_client_schema() {
 				'type' => 'text',
 				'size' => 'small'
 			),
+			'show_default_overlay_layers' => array(
+				'description' => 'Show default overlay layers (if exists).',
+				'type' => 'int',
+				'size' => 'tiny'
+			),
 			'show_button_open_map_url' => array(
 				'description' => 'Show the button to open the map banner URL.',
 				'type' => 'int',
@@ -138,5 +143,16 @@ function eatlas_map_client_update_7006(&$sandbox) {
 	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_metadata')) {
 		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
 		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_metadata', $schema['fields']['enable_metadata']);
+	}
+}
+
+
+/**
+ * Add show_default_overlay_layer field. (7.x-1.6)
+ */
+function eatlas_map_client_update_7007(&$sandbox) {
+	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_default_overlay_layers')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
+		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_default_overlay_layers', $schema['fields']['show_default_overlay_layers']);
 	}
 }

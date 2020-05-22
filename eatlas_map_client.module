@@ -163,6 +163,17 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		)
 	);
 
+	$form['show_default_overlay_layers'] = array(
+		'#type' => 'select',
+		'#title' => t('Show default overlay layers'),
+		'#description' => t('When a map is loaded, should the default overlay layers be displayed?'),
+		'#default_value' => property_exists($map_client, 'show_default_overlay_layers') ? $map_client->show_default_overlay_layers : 1,
+		'#options' => array(
+			1 => 'Show',
+			0 => 'Hide'
+		)
+	);
+
 	$form['enable_select_layers'] = array(
 		'#type' => 'select',
 		'#title' => t('Select layers'),
@@ -295,7 +306,8 @@ function eatlas_map_client_block_view($delta = '') {
 			$map_config['projection'] = 'EPSG:4326';
 			$map_config['configHost'] = $map_client->map_config_host;
 			$map_config['configURL'] = $map_client->map_config_url;
-			$map_config['showButtonOpenMapUrl'] = $map_client->show_button_open_map_url === '1' ? true : false;
+			$map_config['showButtonOpenMapUrl'] = $map_client->show_button_open_map_url === '1';
+			$map_config['disableDefaultOverlayLayer'] = $map_client->show_default_overlay_layers === '1' ? false : true;
 			$map_config['disableShowLayers'] = $map_client->enable_select_layers === '1' ? false : true;
 			$map_config['disableMetadata'] = $map_client->enable_metadata === '1' ? false : true;
 			$map_config['disableFeatureRequests'] = $map_client->enable_feature_requests === '1' ? false : true;
@@ -461,6 +473,7 @@ function _get_edited_map_client($mcid, $values = array()) {
 	$map_client->map_config_host = $values['map_config_host'];
 	$map_client->map_config_url = $values['map_config_url'];
 	$map_client->show_button_open_map_url = $values['show_button_open_map_url'];
+	$map_client->show_default_overlay_layers = $values['show_default_overlay_layers'];
 	$map_client->enable_select_layers = $values['enable_select_layers'];
 	$map_client->enable_metadata = $values['enable_metadata'];
 	$map_client->enable_feature_requests = $values['enable_feature_requests'];
