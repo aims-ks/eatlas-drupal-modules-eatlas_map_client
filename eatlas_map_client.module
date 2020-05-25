@@ -9,45 +9,64 @@ include_once('eatlas_map_client.constants.inc');
 function eatlas_map_client_menu() {
 	$items = array();
 
-	// NOTE: admin/config/eatlas is defined in "eatlas_commons"
-
 	// Overview
 	// List all Map Client blocks
 	$items['admin/config/eatlas/eatlas_map_client'] = array(
-		'title' => 'Map Client blocks',
-		'description' => 'List all eAtlas Map Client blocks',
+		'title' => 'Map Client configurations',
+		'description' => 'List all eAtlas Map Client definitions and blocks',
 		'page callback' => '_eatlas_map_client_overview',
-
 		'access callback' => '_eatlas_map_client_view_access',
-
 		'file' => 'eatlas_map_client.admin.inc'
 	);
 
+  // Add a Map Client definition
+  $items['admin/config/eatlas/eatlas_map_client/definition/add'] = array(
+    'title' => 'Add a Map Client definition',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_eatlas_map_client_edit_definition_form'),
+    'access callback' => '_eatlas_map_client_admin_access',
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'eatlas_map_client.admin.inc',
+    'weight' => 1
+  );
+
+  // Edit a Map Client definition
+  $items['admin/config/eatlas/eatlas_map_client/definition/%/edit'] = array(
+    'title' => 'Edit a Map Client definition',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_eatlas_map_client_edit_definition_form', 5),
+    'access callback' => '_eatlas_map_client_admin_access',
+    'file' => 'eatlas_map_client.admin.inc'
+  );
+
+  // Delete a Map Client definition
+  $items['admin/config/eatlas/eatlas_map_client/definition/%/delete'] = array(
+    'title' => 'Delete a Map Client definition',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_eatlas_map_client_form_confirm_delete_definition', 5),
+    'access callback' => '_eatlas_map_client_admin_access',
+    'file' => 'eatlas_map_client.admin.inc'
+  );
+
 	// Add a Map Client block
-	$items['admin/config/eatlas/eatlas_map_client/add'] = array(
-		// NOTE: The title doesn't show on the page. It's a known bug related to MENU_LOCAL_ACTION:
-		//   https://www.drupal.org/node/891892
+	$items['admin/config/eatlas/eatlas_map_client/block/add'] = array(
 		'title' => 'Add a Map Client block',
 		'page callback' => 'drupal_get_form',
-		'page arguments' => array('_eatlas_map_client_add_form'),
-
+		'page arguments' => array('_eatlas_map_client_add_block_form'),
 		'access callback' => '_eatlas_map_client_admin_access',
-
 		'type' => MENU_LOCAL_ACTION,
-		'file' => 'eatlas_map_client.admin.inc'
+		'file' => 'eatlas_map_client.admin.inc',
+    'weight' => 2
 	);
 
 	// Delete a Map Client block
-	$items['admin/config/eatlas/eatlas_map_client/%/delete'] = array(
-		'title callback' => '_eatlas_map_client_delete_title',
-		'title arguments' => array(4),
+	$items['admin/config/eatlas/eatlas_map_client/block/%/delete'] = array(
+		'title callback' => '_eatlas_map_client_delete_block_title',
+		'title arguments' => array(5),
 		'description' => 'Delete Map Client block',
 		'page callback' => 'drupal_get_form',
-		'page arguments' => array('_eatlas_map_client_form_confirm_delete', 4),
-
+		'page arguments' => array('_eatlas_map_client_form_confirm_delete_block', 5),
 		'access callback' => '_eatlas_map_client_admin_access',
-		'access arguments' => array(4),
-
 		'file' => 'eatlas_map_client.admin.inc'
 	);
 
@@ -79,7 +98,7 @@ function _eatlas_map_client_admin_access() {
 	return TRUE; // TODO
 }
 
-function _eatlas_map_client_edit_access($mcid) {
+function _eatlas_map_client_edit_access($mcbid) {
 	return TRUE; // TODO
 }
 
@@ -95,9 +114,9 @@ function _eatlas_map_client_edit_access($mcid) {
 function eatlas_map_client_block_info() {
 	$blocks = array();
 
-	$map_client_array = eatlas_map_client_load_all();
-	foreach ($map_client_array as $map_client) {
-		$block_id = EATLAS_MAP_CLIENTS_BLOCK_PREFIX . $map_client->mcid;
+	$map_client_block_array = eatlas_map_client_block_config_load_all();
+	foreach ($map_client_block_array as $map_client_block) {
+		$block_id = EATLAS_MAP_CLIENT_BLOCK_PREFIX . $map_client_block->mcbid;
 		$block = block_load('eatlas_map_client', $block_id);
 
 		$blocks[$block_id] = array(
@@ -120,10 +139,10 @@ function eatlas_map_client_block_info() {
 function eatlas_map_client_block_configure($delta = '') {
 	$form = array();
 
-	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENTS_BLOCK_PREFIX)) {
-		$mcid = substr($delta, strlen(EATLAS_MAP_CLIENTS_BLOCK_PREFIX));
-		$map_client = eatlas_map_client_load($mcid);
-		_eatlas_map_client_add_form_fields($form, $map_client);
+	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENT_BLOCK_PREFIX)) {
+		$mcbid = substr($delta, strlen(EATLAS_MAP_CLIENT_BLOCK_PREFIX));
+		$map_client_block_config = eatlas_map_client_block_config_load($mcbid);
+		_eatlas_map_client_add_block_form_fields($form, $map_client_block_config);
 	}
 
 	return $form;
@@ -133,41 +152,63 @@ function eatlas_map_client_block_configure($delta = '') {
  * Form API:
  * 		https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7.x
  * @param $form
- * @param $map_client
+ * @param $map_client_definition
  */
-function _eatlas_map_client_add_form_fields(&$form, $map_client) {
+function _eatlas_map_client_edit_definition_form_fields(&$form, $map_client_definition) {
 	$form['map_config_host'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Map configuration host'),
-		'#description' => t('Host for getting the map configuration'),
-		'#default_value' => property_exists($map_client, 'map_config_host') ? $map_client->map_config_host : 'maps.eatlas.org.au',
+		'#description' => t('Host for getting the map configuration, e.g. "maps.eatlas.org.au"'),
+		'#default_value' => property_exists($map_client_definition, 'map_config_host') ? $map_client_definition->map_config_host : '',
 		'#required' => TRUE
 	);
 
 	$form['map_config_url'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Map configuration URL'),
-		'#description' => t('URL to JSON configuration'),
-		'#default_value' => property_exists($map_client, 'map_config_url') ? $map_client->map_config_url : 'atlasmapper/client/gbrf/config/main.json',
+		'#description' => t('URL to JSON configuration, e.g. "atlasmapper/client/gbrf/config/main.json"'),
+		'#default_value' => property_exists($map_client_definition, 'map_config_url') ? $map_client_definition->map_config_url : '',
 		'#required' => TRUE
-	);
-
-	$form['show_button_open_map_url'] = array(
-		'#type' => 'select',
-		'#title' => t('Open map URL button'),
-		'#description' => t('Show the button to open the map banner URL.'),
-		'#default_value' => property_exists($map_client, 'show_button_open_map_url') ? $map_client->show_button_open_map_url : 1,
-		'#options' => array(
-			1 => 'Show',
-			0 => 'Hide'
-		)
 	);
 
 	$form['show_default_overlay_layers'] = array(
 		'#type' => 'select',
 		'#title' => t('Show default overlay layers'),
 		'#description' => t('When a map is loaded, should the default overlay layers be displayed?'),
-		'#default_value' => property_exists($map_client, 'show_default_overlay_layers') ? $map_client->show_default_overlay_layers : 1,
+		'#default_value' => property_exists($map_client_definition, 'show_default_overlay_layers') ? $map_client_definition->show_default_overlay_layers : 1,
+		'#options' => array(
+			1 => 'Show',
+			0 => 'Hide'
+		)
+	);
+}
+
+/**
+ * Form API:
+ * 		https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7.x
+ * @param $form
+ * @param $map_client_block
+ */
+function _eatlas_map_client_add_block_form_fields(&$form, $map_client_block) {
+  $map_client_definitions = eatlas_map_client_definition_config_load_all();
+  $map_client_definitions_options = array();
+  foreach ($map_client_definitions as $map_client_definition) {
+    $map_client_definitions_options[$map_client_definition->mcdid] = $map_client_definition->map_config_host;
+  }
+
+  $form['default_mcdid'] = array(
+    '#type' => 'select',
+    '#title' => t('Default map client definition'),
+    '#description' => t('Select the map client definition which should be used as a default for this block.'),
+    '#default_value' => property_exists($map_client_block, 'default_mcdid') ? $map_client_block->default_mcdid : NULL,
+    '#options' => $map_client_definitions_options
+  );
+
+	$form['show_button_open_map_url'] = array(
+		'#type' => 'select',
+		'#title' => t('Open map URL button'),
+		'#description' => t('Show the button to open the map banner URL.'),
+		'#default_value' => property_exists($map_client_block, 'show_button_open_map_url') ? $map_client_block->show_button_open_map_url : 1,
 		'#options' => array(
 			1 => 'Show',
 			0 => 'Hide'
@@ -178,7 +219,7 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		'#type' => 'select',
 		'#title' => t('Select layers'),
 		'#description' => t('Enable the select layers dialog.'),
-		'#default_value' => property_exists($map_client, 'enable_select_layers') ? $map_client->enable_select_layers : 1,
+		'#default_value' => property_exists($map_client_block, 'enable_select_layers') ? $map_client_block->enable_select_layers : 1,
 		'#options' => array(
 			1 => 'On',
 			0 => 'Off'
@@ -189,7 +230,7 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		'#type' => 'select',
 		'#title' => t('Show metadata'),
 		'#description' => t('Enable the metadata feature.'),
-		'#default_value' => property_exists($map_client, 'enable_metadata') ? $map_client->enable_metadata : 1,
+		'#default_value' => property_exists($map_client_block, 'enable_metadata') ? $map_client_block->enable_metadata : 1,
 		'#options' => array(
 			1 => 'On',
 			0 => 'Off'
@@ -200,7 +241,7 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		'#type' => 'select',
 		'#title' => t('Feature requests'),
 		'#description' => t('Enable feature requests.'),
-		'#default_value' => property_exists($map_client, 'enable_feature_requests') ? $map_client->enable_feature_requests : 1,
+		'#default_value' => property_exists($map_client_block, 'enable_feature_requests') ? $map_client_block->enable_feature_requests : 1,
 		'#options' => array(
 			1 => 'On',
 			0 => 'Off'
@@ -211,7 +252,7 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		'#type' => 'select',
 		'#title' => t('Feature requests result position'),
 		'#description' => t('Define where the results of the feature requests should be shown.'),
-		'#default_value' => property_exists($map_client, 'feature_requests_results_position') ? $map_client->feature_requests_results_position : 1,
+		'#default_value' => property_exists($map_client_block, 'feature_requests_results_position') ? $map_client_block->feature_requests_results_position : 1,
 		'#options' => array(
 			1 => 'Right',
 			2 => 'Bottom',
@@ -224,7 +265,7 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
 		'#type' => 'select',
 		'#title' => t('Default active component'),
 		'#description' => t('Define which component should be activated by default.'),
-		'#default_value' => property_exists($map_client, 'default_active_component') ? $map_client->default_active_component : '',
+		'#default_value' => property_exists($map_client_block, 'default_active_component') ? $map_client_block->default_active_component : '',
 		'#options' => array(
 			'' => 'None',
 			'legend' => 'Legend',
@@ -233,7 +274,6 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
       'metadata' => 'Metadata'
 		)
 	);
-
 }
 
 /**
@@ -242,13 +282,12 @@ function _eatlas_map_client_add_form_fields(&$form, $map_client) {
  * Save the value set by the user. Fields defined in "hook_block_configure".
  * @param string $delta
  * @param array $edit
- * @throws Exception
  */
 function eatlas_map_client_block_save($delta = '', $edit = array()) {
-	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENTS_BLOCK_PREFIX)) {
-		$mcid = substr($delta, strlen(EATLAS_MAP_CLIENTS_BLOCK_PREFIX));
-		$map_client = _get_edited_map_client($mcid, $edit);
-		eatlas_map_client_save($map_client);
+	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENT_BLOCK_PREFIX)) {
+		$mcbid = substr($delta, strlen(EATLAS_MAP_CLIENT_BLOCK_PREFIX));
+		$map_client_block = _get_edited_map_client_block($mcbid, $edit);
+		eatlas_map_client_block_save($map_client_block);
 	}
 }
 
@@ -258,7 +297,7 @@ function eatlas_map_client_block_save($delta = '', $edit = array()) {
  * @return array
  */
 function eatlas_map_client_block_view($delta = '') {
-	$block = array();
+  $block = array();
 	$node = menu_get_object();
 
 	if (!$node) {
@@ -266,7 +305,7 @@ function eatlas_map_client_block_view($delta = '') {
 	}
 
 	$field_map_banner = field_get_items('node', $node, 'field_map_banner');
-	if (!is_array($field_map_banner) || count($field_map_banner) < 1) {
+  if (!is_array($field_map_banner) || count($field_map_banner) < 1) {
 		return $block;
 	}
 	$field_map_banner_type = field_get_items('node', $node, 'field_map_banner_type');
@@ -274,7 +313,13 @@ function eatlas_map_client_block_view($delta = '') {
 		return $block;
 	}
 
-	////////////////////////////////////////////////////////////////////////////
+  $field_map_banner_mcdid = field_get_items('node', $node, 'field_map_banner_configuration‎');
+  if (!is_array($field_map_banner_mcdid) || count($field_map_banner_mcdid) < 1) {
+    // set to null so that the default definition will be used
+    $field_map_banner_mcdid = array(array('value' => null));
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
 	/// MH, 2018-02-07, hack for displaying the GBRF page as an iframe
 	/// ToDo remove code
 	////////////////////////////////////////////////////////////////////////////
@@ -298,22 +343,29 @@ function eatlas_map_client_block_view($delta = '') {
 		return $block;
 	}
 
-	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENTS_BLOCK_PREFIX)) {
-		$mcid = substr($delta, strlen(EATLAS_MAP_CLIENTS_BLOCK_PREFIX));
-		$map_client = eatlas_map_client_load($mcid);
+	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENT_BLOCK_PREFIX)) {
+		$mcbid = substr($delta, strlen(EATLAS_MAP_CLIENT_BLOCK_PREFIX));
+		$map_client_block = eatlas_map_client_block_config_load($mcbid);
+    $map_client_definition = null;
+		if (!$field_map_banner_mcdid[0]['value']) {
+      $map_client_definition = eatlas_map_client_definition_config_load($map_client_block->default_mcdid);
+    } else {
+      $map_client_definition = eatlas_map_client_definition_config_load($field_map_banner_mcdid[0]['value']);
+    }
 
-		if ($map_client) {
+		if ($map_client_block) {
 			$map_config['projection'] = 'EPSG:4326';
-			$map_config['configHost'] = $map_client->map_config_host;
-			$map_config['configURL'] = $map_client->map_config_url;
-			$map_config['showButtonOpenMapUrl'] = $map_client->show_button_open_map_url === '1';
-			$map_config['disableDefaultOverlayLayer'] = $map_client->show_default_overlay_layers === '1' ? false : true;
-			$map_config['disableShowLayers'] = $map_client->enable_select_layers === '1' ? false : true;
-			$map_config['disableMetadata'] = $map_client->enable_metadata === '1' ? false : true;
-			$map_config['disableFeatureRequests'] = $map_client->enable_feature_requests === '1' ? false : true;
-			$map_config['defaultActiveComponent'] = $map_client->default_active_component;
+			$map_config['configHost'] = $map_client_definition->map_config_host;
+			$map_config['configURL'] = $map_client_definition->map_config_url;
+      $map_config['disableDefaultOverlayLayer'] = $map_client_definition->show_default_overlay_layers === '1' ? false : true;
 
-			switch ($map_client->feature_requests_results_position) {
+      $map_config['showButtonOpenMapUrl'] = $map_client_block->show_button_open_map_url === '1';
+			$map_config['disableShowLayers'] = $map_client_block->enable_select_layers === '1' ? false : true;
+			$map_config['disableMetadata'] = $map_client_block->enable_metadata === '1' ? false : true;
+			$map_config['disableFeatureRequests'] = $map_client_block->enable_feature_requests === '1' ? false : true;
+			$map_config['defaultActiveComponent'] = $map_client_block->default_active_component;
+
+			switch ($map_client_block->feature_requests_results_position) {
 				case '4':
 					$map_config['featureRequestsResultsPosition'] = 'top';
 					break;
@@ -456,31 +508,51 @@ function _parse_map_banner_url($map_banner_url) {
 }
 
 /**
- * @param $mcid
+ * @param $mcbid
  * @param array $values
  * @return null|stdClass
  */
-function _get_edited_map_client($mcid, $values = array()) {
-	$map_client = NULL;
-	if ($mcid !== NULL) {
-		$map_client = eatlas_map_client_load($mcid);
+function _get_edited_map_client_block($mcbid, $values = array()) {
+	$map_client_block = NULL;
+	if ($mcbid !== NULL) {
+		$map_client_block = eatlas_map_client_block_config_load($mcbid);
 	}
 
-	if ($map_client === NULL) {
-		$map_client = new stdClass();
+	if ($map_client_block === NULL) {
+		$map_client_block = new stdClass();
 	}
 
-	$map_client->map_config_host = $values['map_config_host'];
-	$map_client->map_config_url = $values['map_config_url'];
-	$map_client->show_button_open_map_url = $values['show_button_open_map_url'];
-	$map_client->show_default_overlay_layers = $values['show_default_overlay_layers'];
-	$map_client->enable_select_layers = $values['enable_select_layers'];
-	$map_client->enable_metadata = $values['enable_metadata'];
-	$map_client->enable_feature_requests = $values['enable_feature_requests'];
-	$map_client->feature_requests_results_position = $values['feature_requests_results_position'];
-	$map_client->default_active_component = $values['default_active_component'];
+  $map_client_block->show_button_open_map_url = $values['show_button_open_map_url'];
+	$map_client_block->enable_select_layers = $values['enable_select_layers'];
+	$map_client_block->enable_metadata = $values['enable_metadata'];
+	$map_client_block->enable_feature_requests = $values['enable_feature_requests'];
+	$map_client_block->feature_requests_results_position = $values['feature_requests_results_position'];
+	$map_client_block->default_active_component = $values['default_active_component'];
 
-	return $map_client;
+	return $map_client_block;
+}
+/**
+ * @param $mcdid
+ * @param array $values
+ * @return null|stdClass
+ */
+function _get_edited_map_client_definition($mcdid, $values = array()) {
+	$map_client_definition = NULL;
+	if ($mcdid !== NULL) {
+		$map_client_definition = eatlas_map_client_block_config_load($mcdid);
+	}
+
+	if ($map_client_definition === NULL) {
+		$map_client_definition = new stdClass();
+	} else {
+    $map_client_definition->mcdid = $mcdid;
+  }
+
+	$map_client_definition->map_config_host = $values['map_config_host'];
+	$map_client_definition->map_config_url = $values['map_config_url'];
+  $map_client_definition->show_default_overlay_layers = $values['show_default_overlay_layers'];
+
+	return $map_client_definition;
 }
 
 
@@ -489,13 +561,73 @@ function _get_edited_map_client($mcid, $values = array()) {
  */
 
 /**
+ * Load all mab client definitions
  * @return array
  */
-function eatlas_map_client_load_all () {
-	// DB Select using the Drupal objects
-	//   https://api.drupal.org/api/drupal/includes!database!database.inc/function/db_select/7
-	$query = db_select(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'mc')
-		->fields('mc');
+function eatlas_map_client_definition_config_load_all() {
+  $query = db_select(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'mcd')
+    ->fields('mcd');
+  $result = $query->execute();
+
+  $definitions = array();
+  while ($data = $result->fetchAssoc()) {
+    $definitions[] = (object)$data;
+  }
+  return $definitions;
+}
+
+/**
+ * Load a single map client definition
+ * @param $mcdid : The Map Client definition ID.
+ * @return object|stdClass
+ */
+function eatlas_map_client_definition_config_load($mcdid) {
+  if ($mcdid === NULL) {
+    return new stdClass();
+  }
+
+  $query = db_select(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'mcd')
+    ->fields('mcd')
+    ->condition('mcd.mcdid', $mcdid, '=');
+  $result = $query->execute();
+
+  $data = $result->fetchAssoc();
+  if (!$data) {
+    return new stdClass();
+  }
+
+  return (object)$data;
+}
+
+/**
+ * Save a map client definition
+ * @param $map_client_definition : The Map Client definition object to be saved.
+ */
+function eatlas_map_client_definition_config_save($map_client_definition) {
+  // Transform the object into an Array to be sent to the DB.
+  $map_client_definition_fields = (array) $map_client_definition;
+  $mcdid = isset($map_client_definition_fields['mcdid']) ? $map_client_definition_fields['mcdid'] : NULL;
+  if ($mcdid === NULL) {
+    // Insert
+    db_insert(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)->fields($map_client_definition_fields)->execute();
+  } else {
+    // Update
+    // mcdid is used in the "WHERE" clause, not in the values.
+    unset($map_client_definition_fields['mcdid']);
+    db_update(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
+      ->fields($map_client_definition_fields)
+      ->condition('mcdid', $mcdid)
+      ->execute();
+  }
+}
+
+/**
+ * Load all mab client blocks
+ * @return array
+ */
+function eatlas_map_client_block_config_load_all () {
+	$query = db_select(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'mcb')
+		->fields('mcb');
 	$result = $query->execute();
 
 	$blocks = array();
@@ -507,20 +639,18 @@ function eatlas_map_client_load_all () {
 }
 
 /**
- * Follow the convention of node_load.
- * $mcid: The Map Client ID.
- *   https://api.drupal.org/api/drupal/modules%21node%21node.module/function/node_load/7
+ * Load a single map client block
+ * @param $mcbid : The Map Client block ID.
+ * @return object|stdClass
  */
-function eatlas_map_client_load($mcid) {
-	if ($mcid === NULL) {
+function eatlas_map_client_block_config_load($mcbid) {
+	if ($mcbid === NULL) {
 		return new stdClass();
 	}
 
-	// DB Select using the Drupal objects
-	//   https://api.drupal.org/api/drupal/includes!database!database.inc/function/db_select/7
-	$query = db_select(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'mc')
-		->fields('mc')
-		->condition('mc.mcid', $mcid, '=');
+	$query = db_select(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'mcb')
+		->fields('mcb')
+		->condition('mcb.mcbid', $mcbid, '=');
 	$result = $query->execute();
 
 	$data = $result->fetchAssoc();
@@ -533,37 +663,45 @@ function eatlas_map_client_load($mcid) {
 }
 
 /**
- * Follow the convention of node_save.
- * $map_client_block: The Map Client block object to be saved.
- *   https://api.drupal.org/api/drupal/modules%21node%21node.module/function/node_save/7
- * @throws Exception
+ * Save a map client block
+ * @param $map_client_block : The Map Client block object to be saved.
+ * @return DatabaseStatementInterface|int|mixed|null
  */
-function eatlas_map_client_save($map_client_block) {
+function eatlas_map_client_block_config_save($map_client_block) {
 	// Transform the object into an Array to be sent to the DB.
 	$map_client_block_fields = (array) $map_client_block;
 
-	$mcid = isset($map_client_block_fields['mcid']) ? $map_client_block_fields['mcid'] : NULL;
+	$mcbid = isset($map_client_block_fields['mcbid']) ? $map_client_block_fields['mcbid'] : NULL;
 
-	if ($mcid === NULL) {
+	if ($mcbid === NULL) {
 		// Insert
-		//   https://api.drupal.org/api/drupal/includes%21database%21query.inc/function/InsertQuery%3A%3Aexecute/7
-		$mcid = db_insert(EATLAS_MAP_CLIENTS_LIST_DB_TABLE)->fields($map_client_block_fields)->execute();
+		$mcbid = db_insert(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE)->fields($map_client_block_fields)->execute();
 	} else {
 		// Update
 
-		// SPID is used in the "WHERE" clause, not in the values.
-		unset($map_client_block_fields['mcid']);
-		db_update(EATLAS_MAP_CLIENTS_LIST_DB_TABLE)->fields($map_client_block_fields)->condition('mcid', $mcid)->execute();
+		// mcbid is used in the "WHERE" clause, not in the values.
+		unset($map_client_block_fields['mcbid']);
+		db_update(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE)
+      ->fields($map_client_block_fields)
+      ->condition('mcbid', $mcbid)
+      ->execute();
 	}
 
-	//watchdog("eatlas_map_client_save", "map_client_block: <pre>" . print_r($map_client_block, TRUE) . "</pre>");
-	return $mcid;
+	return $mcbid;
 }
 
 /**
- * Event listener callback function
- * @param $mcid
+ * Event listener callback function for map client definition delete
+ * @param $mcdid : The map client definition ID
  */
-function eatlas_map_client_delete($mcid) {
-	db_delete(EATLAS_MAP_CLIENTS_LIST_DB_TABLE)->condition('mcid', $mcid)->execute();
+function eatlas_map_client_definition_config_delete($mcdid) {
+	db_delete(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)->condition('mcdid', $mcdid)->execute();
+}
+
+/**
+ * Event listener callback function for map client block delete
+ * @param $mcbid : The map client block ID
+ */
+function eatlas_map_client_block_config_delete($mcbid) {
+	db_delete(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE)->condition('mcbid', $mcbid)->execute();
 }

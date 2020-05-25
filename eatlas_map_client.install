@@ -6,29 +6,46 @@ include_once('eatlas_map_client.constants.inc');
  * @return mixed
  */
 function eatlas_map_client_schema() {
-	$schema[EATLAS_MAP_CLIENTS_LIST_DB_TABLE] = array(
+  $schema[EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE] = array(
+    'description' => 'The eAtlas Map Client configuration table.',
+    'fields' => array(
+      'mcdid' => array(
+        'description' => 'The primary identifier for a Map Client definition (sequential).',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'map_config_host' => array(
+        'description' => 'Host for getting the map configuration.',
+        'type' => 'text',
+        'size' => 'small'
+      ),
+      'map_config_url' => array(
+        'description' => 'Map configuration URL.',
+        'type' => 'text',
+        'size' => 'small'
+      ),
+      'show_default_overlay_layers' => array(
+        'description' => 'Show default overlay layers (if exists).',
+        'type' => 'int',
+        'size' => 'tiny'
+      )
+    ),
+    'primary key' => array('mcdid')
+  );
+
+  $schema[EATLAS_MAP_CLIENT_BLOCK_DB_TABLE] = array(
 		'description' => 'The eAtlas Map Client configuration table.',
 		'fields' => array(
-			'mcid' => array(
-				'description' => 'The primary identifier for a Map Client (sequential).',
+			'mcbid' => array(
+				'description' => 'The primary identifier for a Map Client block (sequential).',
 				'type' => 'serial',
 				'unsigned' => TRUE,
 				'not null' => TRUE
 			),
-			'map_config_host' => array(
-				'description' => 'Host for getting the map configuration.',
-				'type' => 'text',
-				'size' => 'small'
-			),
-			'map_config_url' => array(
-				'description' => 'Map configuration URL.',
-				'type' => 'text',
-				'size' => 'small'
-			),
-			'show_default_overlay_layers' => array(
-				'description' => 'Show default overlay layers (if exists).',
-				'type' => 'int',
-				'size' => 'tiny'
+			'default_mcdid' => array(
+				'description' => 'Default definition to use with this block',
+				'type' => 'int'
 			),
 			'show_button_open_map_url' => array(
 				'description' => 'Show the button to open the map banner URL.',
@@ -61,7 +78,7 @@ function eatlas_map_client_schema() {
 				'size' => 'small'
 			)
 		),
-		'primary key' => array('mcid')
+		'primary key' => array('mcbid')
 	);
 
 	return $schema;
@@ -90,9 +107,9 @@ function eatlas_map_client_schema() {
  * Add show-feature-request field. (7.x-0.4)
  */
 function eatlas_map_client_update_7001(&$sandbox) {
-	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_feature_requests')) {
-		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
-		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_feature_requests', $schema['fields']['enable_feature_requests']);
+	if (!db_field_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'enable_feature_requests')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE);
+		db_add_field(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'enable_feature_requests', $schema['fields']['enable_feature_requests']);
 	}
 }
 
@@ -100,9 +117,9 @@ function eatlas_map_client_update_7001(&$sandbox) {
  * Add feature_requests_results_position field. (7.x-0.4)
  */
 function eatlas_map_client_update_7002(&$sandbox) {
-	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'feature_requests_results_position')) {
-		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
-		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'feature_requests_results_position', $schema['fields']['feature_requests_results_position']);
+	if (!db_field_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'feature_requests_results_position')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE);
+		db_add_field(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'feature_requests_results_position', $schema['fields']['feature_requests_results_position']);
 	}
 }
 
@@ -110,9 +127,9 @@ function eatlas_map_client_update_7002(&$sandbox) {
  * Rename field show_button_select_layers to enable_select_layers. (7.x-0.4)
  */
 function eatlas_map_client_update_7003(&$sandbox) {
-	if (db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_select_layers')) {
-		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
-		db_change_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_select_layers', 'enable_select_layers', $schema['fields']['enable_select_layers']);
+	if (db_field_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'show_button_select_layers')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE);
+		db_change_field(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'show_button_select_layers', 'enable_select_layers', $schema['fields']['enable_select_layers']);
 	}
 }
 
@@ -120,9 +137,9 @@ function eatlas_map_client_update_7003(&$sandbox) {
  * Rename field show_button_feature_requests to enable_feature_requests. (7.x-0.4)
  */
 function eatlas_map_client_update_7004(&$sandbox) {
-	if (db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_feature_requests')) {
-		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
-		db_change_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_button_feature_requests', 'enable_feature_requests', $schema['fields']['enable_feature_requests']);
+	if (db_field_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'show_button_feature_requests')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE);
+		db_change_field(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'show_button_feature_requests', 'enable_feature_requests', $schema['fields']['enable_feature_requests']);
 	}
 }
 
@@ -130,9 +147,9 @@ function eatlas_map_client_update_7004(&$sandbox) {
  * Add default_active_component field. (7.x-0.4)
  */
 function eatlas_map_client_update_7005(&$sandbox) {
-	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'default_active_component')) {
-		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
-		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'default_active_component', $schema['fields']['default_active_component']);
+	if (!db_field_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'default_active_component')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE);
+		db_add_field(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'default_active_component', $schema['fields']['default_active_component']);
 	}
 }
 
@@ -140,19 +157,68 @@ function eatlas_map_client_update_7005(&$sandbox) {
  * Add enable_metadata field. (7.x-0.4)
  */
 function eatlas_map_client_update_7006(&$sandbox) {
-	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_metadata')) {
-		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
-		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'enable_metadata', $schema['fields']['enable_metadata']);
+	if (!db_field_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'enable_metadata')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE);
+		db_add_field(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'enable_metadata', $schema['fields']['enable_metadata']);
 	}
 }
-
 
 /**
  * Add show_default_overlay_layer field. (7.x-1.6)
  */
 function eatlas_map_client_update_7007(&$sandbox) {
-	if (!db_field_exists(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_default_overlay_layers')) {
-		$schema = drupal_get_schema(EATLAS_MAP_CLIENTS_LIST_DB_TABLE);
-		db_add_field(EATLAS_MAP_CLIENTS_LIST_DB_TABLE, 'show_default_overlay_layers', $schema['fields']['show_default_overlay_layers']);
+	if (!db_field_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'show_default_overlay_layers')) {
+		$schema = drupal_get_schema(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE);
+		db_add_field(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, 'show_default_overlay_layers', $schema['fields']['show_default_overlay_layers']);
 	}
+}
+
+/**
+ * Split module table into block and definition. (7.x-2.0)
+ */
+function eatlas_map_client_update_7008(&$sandbox) {
+  // 'eatlas_map_client' previously combined definition and block table
+  $prevTableName = 'eatlas_map_client';
+
+  if (db_table_exists($prevTableName) && !db_table_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE) &&
+      !db_table_exists(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)) {
+
+    // create definition table
+    $schemas = eatlas_map_client_schema();
+    $definitionTableSchema = $schemas[EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE];
+    db_create_table(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, $definitionTableSchema);
+
+    // create block table
+    $blockTableSchema = $schemas[EATLAS_MAP_CLIENT_BLOCK_DB_TABLE];
+    db_create_table(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE, $blockTableSchema);
+
+    $data = db_select($prevTableName, 'eat')
+      ->fields('eat')
+      ->execute()
+      ->fetchAllAssoc("mcid");
+    foreach ($data as $row) {
+      $mcdid = db_insert(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
+        ->fields(array(
+          'mcdid' => $row->mcid,
+          'map_config_host' => $row->map_config_host,
+          'map_config_url' => $row->map_config_url,
+          'show_default_overlay_layers' => $row->show_default_overlay_layers
+        ))
+        ->execute();
+      db_insert(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE)
+        ->fields(array(
+          'mcbid' => $row->mcid,
+          'default_mcdid' => $mcdid,
+          'show_button_open_map_url' => $row->show_button_open_map_url,
+          'enable_select_layers' => $row->enable_select_layers,
+          'enable_metadata' => $row->enable_metadata,
+          'enable_feature_requests' => $row->enable_feature_requests,
+          'feature_requests_results_position' => $row->feature_requests_results_position,
+          'default_active_component' => $row->default_active_component
+        ))
+        ->execute();
+    }
+
+    db_delete($prevTableName);
+  }
 }
