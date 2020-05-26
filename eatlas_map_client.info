@@ -13,5 +13,7 @@ dependencies[] = eatlas_spatial_publisher (>=0.29)
 ; Attributes used by the update module.
 ; There fields needs to be removed if the module is migrated to Drupal.org
 project status url = "http://drupal.eatlas.org.au/modules/eatlas"
+
+; Breaking changes between version 1 and 2. Please first update to v1.6 before updating to v2
 version = "7.x-2.0.1"
 project = "eatlas_map_client"
