@@ -6,26 +6,26 @@ include_once('eatlas_map_client.constants.inc');
  * @return string
  */
 function _eatlas_map_client_overview() {
-  $output = '<h3>' . t('eAtlas Map Clients Definitions overview') . '</h3>';
+  $output = '<h3>' . t('eAtlas Map Clients Configurations overview') . '</h3>';
 
-  // Load all Map Client definitions
-  $map_client_definitions_array = eatlas_map_client_definition_config_load_all();
+  // Load all Map Client configurations
+  $map_client_configurations_array = eatlas_map_client_configuration_load_all();
 
   $defTableHeader = array(t('Host'), array('data' => t('Operations'), 'colspan' => 2));
   $defTableRows = array();
-  foreach ($map_client_definitions_array as $map_client_definition) {
+  foreach ($map_client_configurations_array as $map_client_configuration) {
     $defTableRows[] = array(
-      $map_client_definition->map_config_host,
+      $map_client_configuration->map_config_host,
       l(
         t('edit'),
-        "admin/config/eatlas/eatlas_map_client/definition/" . $map_client_definition->mcdid . "/edit",
+        "admin/config/eatlas/eatlas_map_client/configuration/" . $map_client_configuration->mccid . "/edit",
         array(
           'query' => array('destination' => 'admin/config/eatlas/eatlas_map_client')
         )
       ),
       l(
         t('delete'),
-        "admin/config/eatlas/eatlas_map_client/definition/" . $map_client_definition->mcdid . "/delete",
+        "admin/config/eatlas/eatlas_map_client/configuration/" . $map_client_configuration->mccid . "/delete",
         array(
           'query' => array('destination' => 'admin/config/eatlas/eatlas_map_client')
         )
@@ -36,12 +36,12 @@ function _eatlas_map_client_overview() {
   $output .= theme('table', array(
     'header' => $defTableHeader,
     'rows' => $defTableRows,
-    'empty' => t('No Map Client definition available.')
+    'empty' => t('No Map Client configuration available.')
   ));
 
 	$output .= '<h3>' . t('eAtlas Map Clients Blocks overview') . '</h3>';
 
-	// Load all Map Client blocks and definitions
+	// Load all Map Client blocks and configurations
 	$map_client_blocks_array = eatlas_map_client_block_config_load_all();
 
 	$blockTableHeader = array(t('Title'), array('data' => t('Operations'), 'colspan' => 2));
@@ -80,24 +80,24 @@ function _eatlas_map_client_overview() {
 /**
  * @param $form
  * @param $form_state
- * @param null $mcdid
+ * @param null $mccid
  * @return array
  */
-function _eatlas_map_client_edit_definition_form($form, &$form_state, $mcdid = NULL) {
+function _eatlas_map_client_edit_configuration_form($form, &$form_state, $mccid = NULL) {
   $form = array();
 
-  if ($mcdid !== NULL) {
-    $map_client_definition = eatlas_map_client_definition_config_load($mcdid);
+  if ($mccid !== NULL) {
+    $map_client_configuration = eatlas_map_client_configuration_load($mccid);
   } else {
-    $map_client_definition = new stdClass();
+    $map_client_configuration = new stdClass();
   }
 
-  // load map client definition fields
-  _eatlas_map_client_edit_definition_form_fields($form, $map_client_definition);
+  // load map client configuration fields
+  _eatlas_map_client_edit_configuration_form_fields($form, $map_client_configuration);
   // add hidden fields
-  $form['mcdid'] = array(
+  $form['mccid'] = array(
     '#type' => 'hidden',
-    '#value' => $mcdid
+    '#value' => $mccid
   );
 
   // define actions
@@ -109,7 +109,7 @@ function _eatlas_map_client_edit_definition_form($form, &$form_state, $mcdid = N
     '#access' => _eatlas_map_client_admin_access()
   );
 
-  if ($mcdid !== NULL) {
+  if ($mccid !== NULL) {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
@@ -127,7 +127,7 @@ function _eatlas_map_client_edit_definition_form($form, &$form_state, $mcdid = N
  * @param $form
  * @param $form_state
  */
-function _eatlas_map_client_edit_definition_form_validate($form, &$form_state) {
+function _eatlas_map_client_edit_configuration_form_validate($form, &$form_state) {
 
 }
 
@@ -137,37 +137,37 @@ function _eatlas_map_client_edit_definition_form_validate($form, &$form_state) {
  * @param $form
  * @param $form_state
  */
-function _eatlas_map_client_edit_definition_form_submit($form, &$form_state) {
+function _eatlas_map_client_edit_configuration_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'admin/config/eatlas/eatlas_map_client';
 
-  $mcdid = isset($form_state['values']['mcdid']) ? $form_state['values']['mcdid'] : NULL;
-  $map_client = _get_edited_map_client_definition($mcdid, $form_state['values']);
+  $mccid = isset($form_state['values']['mccid']) ? $form_state['values']['mccid'] : NULL;
+  $map_client_configuration = _get_edited_map_client_configuration($mccid, $form_state['values']);
 
-  eatlas_map_client_definition_config_save($map_client);
+  eatlas_map_client_configuration_save($map_client_configuration);
 }
 
 /**
- * Called from "admin/config/eatlas/eatlas_map_client/definition/%/delete"
- * Confirm deletion of a Map Client
+ * Called from "admin/config/eatlas/eatlas_map_client/configuration/%/delete"
+ * Confirm deletion of a Map Client configuration
  * @param $form
  * @param $form_state
- * @param $mcdid
+ * @param $mccid
  * @return mixed
  */
-function _eatlas_map_client_form_confirm_delete_definition($form, &$form_state, $mcdid) {
+function _eatlas_map_client_form_confirm_delete_configuration($form, &$form_state, $mccid) {
     // Always provide entity id in the same form key as in the entity edit form.
-  $form['mcdid'] = array('#type' => 'value', '#value' => $mcdid);
+  $form['mccid'] = array('#type' => 'value', '#value' => $mccid);
   $form['delete'] = array('#type' => 'value', '#value' => TRUE);
 
-  $map_client_definition = eatlas_map_client_definition_config_load($mcdid);
-  if (property_exists($map_client_definition, 'map_config_host')) {
+  $map_client_configuration = eatlas_map_client_configuration_load($mccid);
+  if (property_exists($map_client_configuration, 'map_config_host')) {
     return confirm_form(
       $form,
-      t('Are you sure you want to delete the Map Client definition for %host?',
-        array('%host' => $map_client_definition->map_config_host)
+      t('Are you sure you want to delete the Map Client configuration for %host?',
+        array('%host' => $map_client_configuration->map_config_host)
       ),
       'admin/config/eatlas/eatlas_map_client',
-      t('This will delete the Map Client definition. This action cannot be undone.'),
+      t('This will delete the Map Client configuration. This action cannot be undone.'),
       t('Delete'),
       t('Cancel')
     );
@@ -181,9 +181,9 @@ function _eatlas_map_client_form_confirm_delete_definition($form, &$form_state, 
  * @param $form
  * @param $form_state
  */
-function _eatlas_map_client_form_confirm_delete_definition_submit($form, &$form_state) {
-  if (isset($form_state['values']['mcdid'])) {
-    eatlas_map_client_definition_config_delete($form_state['values']['mcdid']);
+function _eatlas_map_client_form_confirm_delete_configuration_submit($form, &$form_state) {
+  if (isset($form_state['values']['mccid'])) {
+    eatlas_map_client_configuration_delete($form_state['values']['mccid']);
   }
 
   $form_state['redirect'] = 'admin/config/eatlas/eatlas_map_client';

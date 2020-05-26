@@ -13,37 +13,37 @@ function eatlas_map_client_menu() {
 	// List all Map Client blocks
 	$items['admin/config/eatlas/eatlas_map_client'] = array(
 		'title' => 'Map Client configurations',
-		'description' => 'List all eAtlas Map Client definitions and blocks',
+		'description' => 'List all eAtlas Map Client configuration and blocks',
 		'page callback' => '_eatlas_map_client_overview',
 		'access callback' => '_eatlas_map_client_view_access',
 		'file' => 'eatlas_map_client.admin.inc'
 	);
 
-  // Add a Map Client definition
-  $items['admin/config/eatlas/eatlas_map_client/definition/add'] = array(
-    'title' => 'Add a Map Client definition',
+  // Add a Map Client configuration
+  $items['admin/config/eatlas/eatlas_map_client/configuration/add'] = array(
+    'title' => 'Add a Map Client configuration',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('_eatlas_map_client_edit_definition_form'),
+    'page arguments' => array('_eatlas_map_client_edit_configuration_form'),
     'access callback' => '_eatlas_map_client_admin_access',
     'type' => MENU_LOCAL_ACTION,
     'file' => 'eatlas_map_client.admin.inc',
     'weight' => 1
   );
 
-  // Edit a Map Client definition
-  $items['admin/config/eatlas/eatlas_map_client/definition/%/edit'] = array(
-    'title' => 'Edit a Map Client definition',
+  // Edit a Map Client configuration
+  $items['admin/config/eatlas/eatlas_map_client/configuration/%/edit'] = array(
+    'title' => 'Edit a Map Client configuration',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('_eatlas_map_client_edit_definition_form', 5),
+    'page arguments' => array('_eatlas_map_client_edit_configuration_form', 5),
     'access callback' => '_eatlas_map_client_admin_access',
     'file' => 'eatlas_map_client.admin.inc'
   );
 
-  // Delete a Map Client definition
-  $items['admin/config/eatlas/eatlas_map_client/definition/%/delete'] = array(
-    'title' => 'Delete a Map Client definition',
+  // Delete a Map Client configuration
+  $items['admin/config/eatlas/eatlas_map_client/configuration/%/delete'] = array(
+    'title' => 'Delete a Map Client configuration',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('_eatlas_map_client_form_confirm_delete_definition', 5),
+    'page arguments' => array('_eatlas_map_client_form_confirm_delete_configuration', 5),
     'access callback' => '_eatlas_map_client_admin_access',
     'file' => 'eatlas_map_client.admin.inc'
   );
@@ -152,14 +152,14 @@ function eatlas_map_client_block_configure($delta = '') {
  * Form API:
  * 		https://api.drupal.org/api/drupal/developer%21topics%21forms_api_reference.html/7.x
  * @param $form
- * @param $map_client_definition
+ * @param $map_client_configuration
  */
-function _eatlas_map_client_edit_definition_form_fields(&$form, $map_client_definition) {
+function _eatlas_map_client_edit_configuration_form_fields(&$form, $map_client_configuration) {
 	$form['map_config_host'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Map configuration host'),
 		'#description' => t('Host for getting the map configuration, e.g. "maps.eatlas.org.au"'),
-		'#default_value' => property_exists($map_client_definition, 'map_config_host') ? $map_client_definition->map_config_host : '',
+		'#default_value' => property_exists($map_client_configuration, 'map_config_host') ? $map_client_configuration->map_config_host : '',
 		'#required' => TRUE
 	);
 
@@ -167,7 +167,7 @@ function _eatlas_map_client_edit_definition_form_fields(&$form, $map_client_defi
 		'#type' => 'textfield',
 		'#title' => t('Map configuration URL'),
 		'#description' => t('URL to JSON configuration, e.g. "atlasmapper/client/gbrf/config/main.json"'),
-		'#default_value' => property_exists($map_client_definition, 'map_config_url') ? $map_client_definition->map_config_url : '',
+		'#default_value' => property_exists($map_client_configuration, 'map_config_url') ? $map_client_configuration->map_config_url : '',
 		'#required' => TRUE
 	);
 
@@ -175,7 +175,7 @@ function _eatlas_map_client_edit_definition_form_fields(&$form, $map_client_defi
 		'#type' => 'select',
 		'#title' => t('Show default overlay layers'),
 		'#description' => t('When a map is loaded, should the default overlay layers be displayed?'),
-		'#default_value' => property_exists($map_client_definition, 'show_default_overlay_layers') ? $map_client_definition->show_default_overlay_layers : 1,
+		'#default_value' => property_exists($map_client_configuration, 'show_default_overlay_layers') ? $map_client_configuration->show_default_overlay_layers : 1,
 		'#options' => array(
 			1 => 'Show',
 			0 => 'Hide'
@@ -190,18 +190,18 @@ function _eatlas_map_client_edit_definition_form_fields(&$form, $map_client_defi
  * @param $map_client_block
  */
 function _eatlas_map_client_add_block_form_fields(&$form, $map_client_block) {
-  $map_client_definitions = eatlas_map_client_definition_config_load_all();
-  $map_client_definitions_options = array();
-  foreach ($map_client_definitions as $map_client_definition) {
-    $map_client_definitions_options[$map_client_definition->mcdid] = $map_client_definition->map_config_host;
+  $map_client_configurations = eatlas_map_client_configuration_load_all();
+  $map_client_configurations_options = array();
+  foreach ($map_client_configurations as $map_client_configuration) {
+    $map_client_configurations_options[$map_client_configuration->mccid] = $map_client_configuration->map_config_host;
   }
 
-  $form['default_mcdid'] = array(
+  $form['default_mccid'] = array(
     '#type' => 'select',
-    '#title' => t('Default map client definition'),
-    '#description' => t('Select the map client definition which should be used as a default for this block.'),
-    '#default_value' => property_exists($map_client_block, 'default_mcdid') ? $map_client_block->default_mcdid : NULL,
-    '#options' => $map_client_definitions_options
+    '#title' => t('Default map client configuration'),
+    '#description' => t('Select the map client configuration which should be used as a default for this block.'),
+    '#default_value' => property_exists($map_client_block, 'default_mccid') ? $map_client_block->default_mccid : NULL,
+    '#options' => $map_client_configurations_options
   );
 
 	$form['show_button_open_map_url'] = array(
@@ -315,7 +315,7 @@ function eatlas_map_client_block_view($delta = '') {
 
   $field_map_banner_configuration = field_get_items('node', $node, 'field_map_banner_configuration');
   if (!is_array($field_map_banner_configuration) || count($field_map_banner_configuration) < 1) {
-    // set to null so that the default definition will be used
+    // set to null so that the default configuration will be used
     $field_map_banner_configuration = array(array('tid' => null));
   }
 
@@ -346,18 +346,18 @@ function eatlas_map_client_block_view($delta = '') {
 	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENT_BLOCK_PREFIX)) {
 		$mcbid = substr($delta, strlen(EATLAS_MAP_CLIENT_BLOCK_PREFIX));
 		$map_client_block = eatlas_map_client_block_config_load($mcbid);
-    $map_client_definition = null;
+    $map_client_configuration = null;
 		if (!$field_map_banner_configuration[0]['tid']) {
-      $map_client_definition = eatlas_map_client_definition_config_load($map_client_block->default_mcdid);
+      $map_client_configuration = eatlas_map_client_configuration_load($map_client_block->default_mccid);
     } else {
-      $map_client_definition = eatlas_map_client_definition_config_load_by_tid($field_map_banner_configuration[0]['tid']);
+      $map_client_configuration = eatlas_map_client_configuration_load_by_tid($field_map_banner_configuration[0]['tid']);
     }
 
 		if ($map_client_block) {
 			$map_config['projection'] = 'EPSG:4326';
-			$map_config['configHost'] = $map_client_definition->map_config_host;
-			$map_config['configURL'] = $map_client_definition->map_config_url;
-      $map_config['disableDefaultOverlayLayer'] = $map_client_definition->show_default_overlay_layers === '1' ? false : true;
+			$map_config['configHost'] = $map_client_configuration->map_config_host;
+			$map_config['configURL'] = $map_client_configuration->map_config_url;
+      $map_config['disableDefaultOverlayLayer'] = $map_client_configuration->show_default_overlay_layers === '1' ? false : true;
 
       $map_config['showButtonOpenMapUrl'] = $map_client_block->show_button_open_map_url === '1';
 			$map_config['disableShowLayers'] = $map_client_block->enable_select_layers === '1' ? false : true;
@@ -532,27 +532,27 @@ function _get_edited_map_client_block($mcbid, $values = array()) {
 	return $map_client_block;
 }
 /**
- * @param $mcdid
+ * @param $mccid
  * @param array $values
  * @return null|stdClass
  */
-function _get_edited_map_client_definition($mcdid, $values = array()) {
-	$map_client_definition = NULL;
-	if ($mcdid !== NULL) {
-		$map_client_definition = eatlas_map_client_definition_config_load($mcdid);
+function _get_edited_map_client_configuration($mccid, $values = array()) {
+	$map_client_configuration = NULL;
+	if ($mccid !== NULL) {
+		$map_client_configuration = eatlas_map_client_configuration_load($mccid);
 	}
 
-	if ($map_client_definition === NULL) {
-		$map_client_definition = new stdClass();
+	if ($map_client_configuration === NULL) {
+		$map_client_configuration = new stdClass();
 	} else {
-    $map_client_definition->mcdid = $mcdid;
+    $map_client_configuration->mccid = $mccid;
   }
 
-	$map_client_definition->map_config_host = $values['map_config_host'];
-	$map_client_definition->map_config_url = $values['map_config_url'];
-  $map_client_definition->show_default_overlay_layers = $values['show_default_overlay_layers'];
+	$map_client_configuration->map_config_host = $values['map_config_host'];
+	$map_client_configuration->map_config_url = $values['map_config_url'];
+  $map_client_configuration->show_default_overlay_layers = $values['show_default_overlay_layers'];
 
-  return $map_client_definition;
+  return $map_client_configuration;
 }
 
 
@@ -561,34 +561,34 @@ function _get_edited_map_client_definition($mcdid, $values = array()) {
  */
 
 /**
- * Load all mab client definitions
+ * Load all mab client configurations
  * @return array
  */
-function eatlas_map_client_definition_config_load_all() {
-  $query = db_select(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'mcd')
+function eatlas_map_client_configuration_load_all() {
+  $query = db_select(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE, 'mcd')
     ->fields('mcd');
   $result = $query->execute();
 
-  $definitions = array();
+  $configurations = array();
   while ($data = $result->fetchAssoc()) {
-    $definitions[] = (object)$data;
+    $configurations[] = (object)$data;
   }
-  return $definitions;
+  return $configurations;
 }
 
 /**
- * Load a single map client definition
- * @param $mcdid : The Map Client definition ID.
+ * Load a single map client configuration
+ * @param $mccid : The Map Client configuration ID.
  * @return object|stdClass
  */
-function eatlas_map_client_definition_config_load($mcdid) {
-  if ($mcdid === NULL) {
+function eatlas_map_client_configuration_load($mccid) {
+  if ($mccid === NULL) {
     return new stdClass();
   }
 
-  $query = db_select(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'mcd')
+  $query = db_select(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE, 'mcd')
     ->fields('mcd')
-    ->condition('mcd.mcdid', $mcdid, '=');
+    ->condition('mcd.mccid', $mccid, '=');
   $result = $query->execute();
 
   $data = $result->fetchAssoc();
@@ -600,16 +600,16 @@ function eatlas_map_client_definition_config_load($mcdid) {
 }
 
 /**
- * Load a single map client definition by taxonomy term ID
+ * Load a single map client configuration by taxonomy term ID
  * @param $tid : The taxonomy term ID.
  * @return object|stdClass
  */
-function eatlas_map_client_definition_config_load_by_tid($tid) {
+function eatlas_map_client_configuration_load_by_tid($tid) {
   if ($tid === NULL) {
     return new stdClass();
   }
 
-  $query = db_select(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'mcd')
+  $query = db_select(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE, 'mcd')
     ->fields('mcd')
     ->condition('mcd.tid', $tid, '=');
   $result = $query->execute();
@@ -623,64 +623,64 @@ function eatlas_map_client_definition_config_load_by_tid($tid) {
 }
 
 /**
- * Save a map client definition
- * @param $map_client_definition : The Map Client definition object to be saved.
+ * Save a map client configuration
+ * @param $map_client_configuration : The Map Client configuration object to be saved.
  * @return DatabaseStatementInterface|int|mixed|null
  */
-function eatlas_map_client_definition_config_save($map_client_definition) {
+function eatlas_map_client_configuration_save($map_client_configuration) {
   // Transform the object into an Array to be sent to the DB.
-  $map_client_definition_fields = (array) $map_client_definition;
+  $map_client_configuration_fields = (array) $map_client_configuration;
 
-  $mcdid = isset($map_client_definition_fields['mcdid']) ? $map_client_definition_fields['mcdid'] : NULL;
-  if ($mcdid === NULL) {
-    // Insert map client definition
-    $mcdid = db_insert(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)->fields($map_client_definition_fields)->execute();
+  $mccid = isset($map_client_configuration_fields['mccid']) ? $map_client_configuration_fields['mccid'] : NULL;
+  if ($mccid === NULL) {
+    // Insert map client configuration
+    $mccid = db_insert(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE)->fields($map_client_configuration_fields)->execute();
 
-    // Add new taxonomy term for map client definition
-    $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB);
+    // Add new taxonomy term for map client configuration
+    $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_CONFIGURATION_VOCAB);
     $term = (object)array(
-      'name' => $map_client_definition->map_config_host,
-      'description' => "mcdid: " . $mcdid,
+      'name' => $map_client_configuration->map_config_host,
+      'description' => "mccid: " . $mccid,
       'vid' => $vocab->vid,
     );
     taxonomy_term_save($term);
-    // Add taxonomy term ID to map client definition
-    db_update(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
+    // Add taxonomy term ID to map client configuration
+    db_update(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE)
       ->fields(array('tid' => $term->tid))
-      ->condition('mcdid', $mcdid)
+      ->condition('mccid', $mccid)
       ->execute();
 
   } else {
 
-    $term = taxonomy_term_load($map_client_definition->tid);
-    $term->name = $map_client_definition->map_config_host;
+    $term = taxonomy_term_load($map_client_configuration->tid);
+    $term->name = $map_client_configuration->map_config_host;
     taxonomy_term_save($term);
 
-    // Update map client definition
-    // mcdid is used in the "WHERE" clause, not in the values.
-    unset($map_client_definition_fields['mcdid']);
-    db_update(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
-      ->fields($map_client_definition_fields)
-      ->condition('mcdid', $mcdid)
+    // Update map client configuration
+    // mccid is used in the "WHERE" clause, not in the values.
+    unset($map_client_configuration_fields['mccid']);
+    db_update(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE)
+      ->fields($map_client_configuration_fields)
+      ->condition('mccid', $mccid)
       ->execute();
   }
 
-  return $mcdid;
+  return $mccid;
 }
 
 /**
- * Event listener callback function for map client definition delete
- * @param $mcdid : The map client definition ID
+ * Event listener callback function for map client configuration delete
+ * @param $mccid : The map client configuration ID
  */
-function eatlas_map_client_definition_config_delete($mcdid) {
-  // load map client definition to have the TID assiociated with it
-  $map_client_definition = eatlas_map_client_definition_config_load($mcdid);
+function eatlas_map_client_configuration_delete($mccid) {
+  // load map client configuration to have the TID assiociated with it
+  $map_client_configuration = eatlas_map_client_configuration_load($mccid);
 
-  // delete map client definition
-  db_delete(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)->condition('mcdid', $mcdid)->execute();
+  // delete map client configuration
+  db_delete(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE)->condition('mccid', $mccid)->execute();
 
   // delete taxonomy term
-  taxonomy_term_delete($map_client_definition->tid);
+  taxonomy_term_delete($map_client_configuration->tid);
 }
 
 /**

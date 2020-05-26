@@ -18,7 +18,7 @@ For this module to work it needs the following content fields:
     FIELD TYPE: Term reference
     WIDGET: Select list
     FIELD SETTINGS:
-      Vocabulary: Map Client definitions
+      Vocabulary: Map Client configurations
 
 JS dependencies
 

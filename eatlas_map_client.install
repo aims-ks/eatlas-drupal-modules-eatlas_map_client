@@ -6,11 +6,11 @@ include_once('eatlas_map_client.constants.inc');
  * @return mixed
  */
 function eatlas_map_client_schema() {
-  $schema[EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE] = array(
+  $schema[EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE] = array(
     'description' => 'The eAtlas Map Client configuration table.',
     'fields' => array(
-      'mcdid' => array(
-        'description' => 'The primary identifier for a Map Client definition (sequential).',
+      'mccid' => array(
+        'description' => 'The primary identifier for a Map Client configuration (sequential).',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE
@@ -36,7 +36,7 @@ function eatlas_map_client_schema() {
         'unsigned' => TRUE
       )
     ),
-    'primary key' => array('mcdid')
+    'primary key' => array('mccid')
   );
 
   $schema[EATLAS_MAP_CLIENT_BLOCK_DB_TABLE] = array(
@@ -48,8 +48,8 @@ function eatlas_map_client_schema() {
 				'unsigned' => TRUE,
 				'not null' => TRUE
 			),
-			'default_mcdid' => array(
-				'description' => 'Default definition to use with this block',
+			'default_mccid' => array(
+				'description' => 'Default configuration to use with this block',
 				'type' => 'int'
 			),
 			'show_button_open_map_url' => array(
@@ -93,19 +93,19 @@ function eatlas_map_client_schema() {
  * Implements hook_install().
  */
 function eatlas_map_client_install() {
-  $map_client_definitions_vocab = (object)array(
-    'name' => 'Map Client definitions',
-    'description' => 'This vocabulary is used to reference the map client definitions in articles.',
-    'machine_name' => EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB,
+  $map_client_configurations_vocab = (object)array(
+    'name' => 'Map Client configurations',
+    'description' => 'This vocabulary is used to reference the map client configurations in articles.',
+    'machine_name' => EATLAS_MAP_CLIENT_CONFIGURATION_VOCAB,
   );
-  taxonomy_vocabulary_save($map_client_definitions_vocab);
+  taxonomy_vocabulary_save($map_client_configurations_vocab);
 }
 
 /**
  * Implements hook_uninstall().
  */
 function eatlas_map_client_uninstall() {
-  $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB);
+  $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_CONFIGURATION_VOCAB);
   taxonomy_vocabulary_delete($vocab->vid);
 }
 
@@ -199,19 +199,19 @@ function eatlas_map_client_update_7007(&$sandbox) {
 }
 
 /**
- * Split module table into block and definition. (7.x-2.0)
+ * Split module table into block and configurations. (7.x-2.0)
  */
 function eatlas_map_client_update_7008(&$sandbox) {
-  // 'eatlas_map_client' previously combined definition and block table
+  // 'eatlas_map_client' previously combined configuration and block table
   $prevTableName = 'eatlas_map_client';
 
   if (db_table_exists($prevTableName) && !db_table_exists(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE) &&
-      !db_table_exists(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)) {
+      !db_table_exists(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE)) {
 
-    // create definition table
+    // create configuration table
     $schemas = eatlas_map_client_schema();
-    $definitionTableSchema = $schemas[EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE];
-    db_create_table(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, $definitionTableSchema);
+    $configurationTableSchema = $schemas[EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE];
+    db_create_table(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE, $configurationTableSchema);
 
     // create block table
     $blockTableSchema = $schemas[EATLAS_MAP_CLIENT_BLOCK_DB_TABLE];
@@ -222,9 +222,9 @@ function eatlas_map_client_update_7008(&$sandbox) {
       ->execute()
       ->fetchAllAssoc("mcid");
     foreach ($data as $row) {
-      $mcdid = db_insert(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
+      $mccid = db_insert(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE)
         ->fields(array(
-          'mcdid' => $row->mcid,
+          'mccid' => $row->mcid,
           'map_config_host' => $row->map_config_host,
           'map_config_url' => $row->map_config_url,
           'show_default_overlay_layers' => $row->show_default_overlay_layers
@@ -233,7 +233,7 @@ function eatlas_map_client_update_7008(&$sandbox) {
       db_insert(EATLAS_MAP_CLIENT_BLOCK_DB_TABLE)
         ->fields(array(
           'mcbid' => $row->mcid,
-          'default_mcdid' => $mcdid,
+          'default_mccid' => $mccid,
           'show_button_open_map_url' => $row->show_button_open_map_url,
           'enable_select_layers' => $row->enable_select_layers,
           'enable_metadata' => $row->enable_metadata,
@@ -252,37 +252,37 @@ function eatlas_map_client_update_7008(&$sandbox) {
  * Create vocab and insert terms if not exists. (7.x-2.1)
  */
 function eatlas_map_client_update_7009(&$sandbox) {
-  if (!db_field_exists(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'tid')) {
-    $schema = drupal_get_schema(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE);
-    db_add_field(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'tid', $schema['fields']['tid']);
+  if (!db_field_exists(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE, 'tid')) {
+    $schema = drupal_get_schema(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE);
+    db_add_field(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE, 'tid', $schema['fields']['tid']);
   }
 
-  $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB);
+  $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_CONFIGURATION_VOCAB);
   if (!$vocab) {
-    $map_client_definitions_vocab = (object)array(
-      'name' => 'Map Client definitions',
-      'description' => 'This vocabulary is used to reference the map client definitions in articles.',
-      'machine_name' => EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB,
+    $map_client_configurations_vocab = (object)array(
+      'name' => 'Map Client configurations',
+      'description' => 'This vocabulary is used to reference the map client configurations in articles.',
+      'machine_name' => EATLAS_MAP_CLIENT_CONFIGURATION_VOCAB,
     );
-    taxonomy_vocabulary_save($map_client_definitions_vocab);
+    taxonomy_vocabulary_save($map_client_configurations_vocab);
 
-    $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB);
-    $map_client_definitions = eatlas_map_client_definition_config_load_all();
-    foreach ($map_client_definitions as $map_client_definition)  {
+    $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_CONFIGURATION_VOCAB);
+    $map_client_configurations = eatlas_map_client_configuration_load_all();
+    foreach ($map_client_configurations as $map_client_configuration)  {
       $term = (object)array(
-        'name' => $map_client_definition->map_config_host,
-        'description' => "mcdid: " . $map_client_definition->mcdid,
+        'name' => $map_client_configuration->map_config_host,
+        'description' => "mccid: " . $map_client_configuration->mccid,
         'vid' => $vocab->vid,
       );
       taxonomy_term_save($term);
 
-      $map_client_definition->tid = $term->tid;
-      $map_client_definition_fields = (array)$map_client_definition;
-      $mcdid = $map_client_definition_fields['mcdid'];
-      unset($map_client_definition_fields['mcdid']);
-      db_update(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
-        ->fields($map_client_definition_fields)
-        ->condition('mcdid', $mcdid)
+      $map_client_configuration->tid = $term->tid;
+      $map_client_configuration_fields = (array)$map_client_configuration;
+      $mccid = $map_client_configuration_fields['mccid'];
+      unset($map_client_configuration_fields['mccid']);
+      db_update(EATLAS_MAP_CLIENT_CONFIGURATION_DB_TABLE)
+        ->fields($map_client_configuration_fields)
+        ->condition('mccid', $mccid)
         ->execute();
     }
   }
