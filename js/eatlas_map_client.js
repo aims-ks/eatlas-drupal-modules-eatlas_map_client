@@ -16,6 +16,7 @@
 			zoom: mapConfig.zoom,
 			mapConfigHost: mapConfig.configHost,
 			mapConfigURL: mapConfig.configUrl,
+      disableDefaultOverlayLayer: mapConfig.disableDefaultOverlayLayer,
 			disableShowLayers: mapConfig.disableShowLayers,
 			disableMetadata: mapConfig.disableMetadata,
 			disableFeatureRequests: mapConfig.disableFeatureRequests,
