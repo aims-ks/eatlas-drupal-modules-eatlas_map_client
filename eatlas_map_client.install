@@ -29,6 +29,11 @@ function eatlas_map_client_schema() {
         'description' => 'Show default overlay layers (if exists).',
         'type' => 'int',
         'size' => 'tiny'
+      ),
+      'tid' => array(
+        'description' => 'Taxonomy ID.',
+        'type' => 'int',
+        'unsigned' => TRUE
       )
     ),
     'primary key' => array('mcdid')
@@ -82,6 +87,26 @@ function eatlas_map_client_schema() {
 	);
 
 	return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function eatlas_map_client_install() {
+  $map_client_definitions_vocab = (object)array(
+    'name' => 'Map Client definitions',
+    'description' => 'This vocabulary is used to reference the map client definitions in articles.',
+    'machine_name' => EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB,
+  );
+  taxonomy_vocabulary_save($map_client_definitions_vocab);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function eatlas_map_client_uninstall() {
+  $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB);
+  taxonomy_vocabulary_delete($vocab->vid);
 }
 
 /**
@@ -220,5 +245,45 @@ function eatlas_map_client_update_7008(&$sandbox) {
     }
 
     db_delete($prevTableName);
+  }
+}
+
+/**
+ * Create vocab and insert terms if not exists. (7.x-2.1)
+ */
+function eatlas_map_client_update_7009(&$sandbox) {
+  if (!db_field_exists(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'tid')) {
+    $schema = drupal_get_schema(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE);
+    db_add_field(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'tid', $schema['fields']['tid']);
+  }
+
+  $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB);
+  if (!$vocab) {
+    $map_client_definitions_vocab = (object)array(
+      'name' => 'Map Client definitions',
+      'description' => 'This vocabulary is used to reference the map client definitions in articles.',
+      'machine_name' => EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB,
+    );
+    taxonomy_vocabulary_save($map_client_definitions_vocab);
+
+    $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB);
+    $map_client_definitions = eatlas_map_client_definition_config_load_all();
+    foreach ($map_client_definitions as $map_client_definition)  {
+      $term = (object)array(
+        'name' => $map_client_definition->map_config_host,
+        'description' => "mcdid: " . $map_client_definition->mcdid,
+        'vid' => $vocab->vid,
+      );
+      taxonomy_term_save($term);
+
+      $map_client_definition->tid = $term->tid;
+      $map_client_definition_fields = (array)$map_client_definition;
+      $mcdid = $map_client_definition_fields['mcdid'];
+      unset($map_client_definition_fields['mcdid']);
+      db_update(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
+        ->fields($map_client_definition_fields)
+        ->condition('mcdid', $mcdid)
+        ->execute();
+    }
   }
 }

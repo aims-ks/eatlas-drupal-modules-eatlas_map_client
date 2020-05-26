@@ -92,8 +92,9 @@ function _eatlas_map_client_edit_definition_form($form, &$form_state, $mcdid = N
     $map_client_definition = new stdClass();
   }
 
-  // load map client definition
+  // load map client definition fields
   _eatlas_map_client_edit_definition_form_fields($form, $map_client_definition);
+  // add hidden fields
   $form['mcdid'] = array(
     '#type' => 'hidden',
     '#value' => $mcdid

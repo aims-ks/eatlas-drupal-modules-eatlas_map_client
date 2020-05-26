@@ -313,10 +313,10 @@ function eatlas_map_client_block_view($delta = '') {
 		return $block;
 	}
 
-  $field_map_banner_mcdid = field_get_items('node', $node, 'field_map_banner_configuration‎');
-  if (!is_array($field_map_banner_mcdid) || count($field_map_banner_mcdid) < 1) {
+  $field_map_banner_configuration = field_get_items('node', $node, 'field_map_banner_configuration');
+  if (!is_array($field_map_banner_configuration) || count($field_map_banner_configuration) < 1) {
     // set to null so that the default definition will be used
-    $field_map_banner_mcdid = array(array('value' => null));
+    $field_map_banner_configuration = array(array('tid' => null));
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -347,10 +347,10 @@ function eatlas_map_client_block_view($delta = '') {
 		$mcbid = substr($delta, strlen(EATLAS_MAP_CLIENT_BLOCK_PREFIX));
 		$map_client_block = eatlas_map_client_block_config_load($mcbid);
     $map_client_definition = null;
-		if (!$field_map_banner_mcdid[0]['value']) {
+		if (!$field_map_banner_configuration[0]['tid']) {
       $map_client_definition = eatlas_map_client_definition_config_load($map_client_block->default_mcdid);
     } else {
-      $map_client_definition = eatlas_map_client_definition_config_load($field_map_banner_mcdid[0]['value']);
+      $map_client_definition = eatlas_map_client_definition_config_load_by_tid($field_map_banner_configuration[0]['tid']);
     }
 
 		if ($map_client_block) {
@@ -539,7 +539,7 @@ function _get_edited_map_client_block($mcbid, $values = array()) {
 function _get_edited_map_client_definition($mcdid, $values = array()) {
 	$map_client_definition = NULL;
 	if ($mcdid !== NULL) {
-		$map_client_definition = eatlas_map_client_block_config_load($mcdid);
+		$map_client_definition = eatlas_map_client_definition_config_load($mcdid);
 	}
 
 	if ($map_client_definition === NULL) {
@@ -552,7 +552,7 @@ function _get_edited_map_client_definition($mcdid, $values = array()) {
 	$map_client_definition->map_config_url = $values['map_config_url'];
   $map_client_definition->show_default_overlay_layers = $values['show_default_overlay_layers'];
 
-	return $map_client_definition;
+  return $map_client_definition;
 }
 
 
@@ -600,18 +600,63 @@ function eatlas_map_client_definition_config_load($mcdid) {
 }
 
 /**
+ * Load a single map client definition by taxonomy term ID
+ * @param $tid : The taxonomy term ID.
+ * @return object|stdClass
+ */
+function eatlas_map_client_definition_config_load_by_tid($tid) {
+  if ($tid === NULL) {
+    return new stdClass();
+  }
+
+  $query = db_select(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE, 'mcd')
+    ->fields('mcd')
+    ->condition('mcd.tid', $tid, '=');
+  $result = $query->execute();
+
+  $data = $result->fetchAssoc();
+  if (!$data) {
+    return new stdClass();
+  }
+
+  return (object)$data;
+}
+
+/**
  * Save a map client definition
  * @param $map_client_definition : The Map Client definition object to be saved.
+ * @return DatabaseStatementInterface|int|mixed|null
  */
 function eatlas_map_client_definition_config_save($map_client_definition) {
   // Transform the object into an Array to be sent to the DB.
   $map_client_definition_fields = (array) $map_client_definition;
+
   $mcdid = isset($map_client_definition_fields['mcdid']) ? $map_client_definition_fields['mcdid'] : NULL;
   if ($mcdid === NULL) {
-    // Insert
-    db_insert(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)->fields($map_client_definition_fields)->execute();
+    // Insert map client definition
+    $mcdid = db_insert(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)->fields($map_client_definition_fields)->execute();
+
+    // Add new taxonomy term for map client definition
+    $vocab = taxonomy_vocabulary_machine_name_load(EATLAS_MAP_CLIENT_DEFINITIONS_VOCAB);
+    $term = (object)array(
+      'name' => $map_client_definition->map_config_host,
+      'description' => "mcdid: " . $mcdid,
+      'vid' => $vocab->vid,
+    );
+    taxonomy_term_save($term);
+    // Add taxonomy term ID to map client definition
+    db_update(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
+      ->fields(array('tid' => $term->tid))
+      ->condition('mcdid', $mcdid)
+      ->execute();
+
   } else {
-    // Update
+
+    $term = taxonomy_term_load($map_client_definition->tid);
+    $term->name = $map_client_definition->map_config_host;
+    taxonomy_term_save($term);
+
+    // Update map client definition
     // mcdid is used in the "WHERE" clause, not in the values.
     unset($map_client_definition_fields['mcdid']);
     db_update(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)
@@ -619,6 +664,23 @@ function eatlas_map_client_definition_config_save($map_client_definition) {
       ->condition('mcdid', $mcdid)
       ->execute();
   }
+
+  return $mcdid;
+}
+
+/**
+ * Event listener callback function for map client definition delete
+ * @param $mcdid : The map client definition ID
+ */
+function eatlas_map_client_definition_config_delete($mcdid) {
+  // load map client definition to have the TID assiociated with it
+  $map_client_definition = eatlas_map_client_definition_config_load($mcdid);
+
+  // delete map client definition
+  db_delete(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)->condition('mcdid', $mcdid)->execute();
+
+  // delete taxonomy term
+  taxonomy_term_delete($map_client_definition->tid);
 }
 
 /**
@@ -688,14 +750,6 @@ function eatlas_map_client_block_config_save($map_client_block) {
 	}
 
 	return $mcbid;
-}
-
-/**
- * Event listener callback function for map client definition delete
- * @param $mcdid : The map client definition ID
- */
-function eatlas_map_client_definition_config_delete($mcdid) {
-	db_delete(EATLAS_MAP_CLIENT_DEFINITIONS_DB_TABLE)->condition('mcdid', $mcdid)->execute();
 }
 
 /**
