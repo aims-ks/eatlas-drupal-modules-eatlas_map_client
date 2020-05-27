@@ -284,11 +284,15 @@ function _eatlas_map_client_add_block_form_fields(&$form, $map_client_block) {
  * @param array $edit
  */
 function eatlas_map_client_block_save($delta = '', $edit = array()) {
-	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENT_BLOCK_PREFIX)) {
-		$mcbid = substr($delta, strlen(EATLAS_MAP_CLIENT_BLOCK_PREFIX));
-		$map_client_block = _get_edited_map_client_block($mcbid, $edit);
-		eatlas_map_client_block_save($map_client_block);
-	}
+  try {
+    if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENT_BLOCK_PREFIX)) {
+      $mcbid = substr($delta, strlen(EATLAS_MAP_CLIENT_BLOCK_PREFIX));
+      $map_client_block = _get_edited_map_client_block($mcbid, $edit);
+      eatlas_map_client_block_config_save($map_client_block);
+    }
+  } catch (Exception $exception) {
+    watchdog_exception('eatlas_map_client_block_save', $exception);
+  }
 }
 
 /**
@@ -346,14 +350,15 @@ function eatlas_map_client_block_view($delta = '') {
 	if (eatlas_commons_starts_with($delta, EATLAS_MAP_CLIENT_BLOCK_PREFIX)) {
 		$mcbid = substr($delta, strlen(EATLAS_MAP_CLIENT_BLOCK_PREFIX));
 		$map_client_block = eatlas_map_client_block_config_load($mcbid);
-    $map_client_configuration = null;
+
+		$map_client_configuration = null;
 		if (!$field_map_banner_configuration[0]['tid']) {
       $map_client_configuration = eatlas_map_client_configuration_load($map_client_block->default_mccid);
     } else {
       $map_client_configuration = eatlas_map_client_configuration_load_by_tid($field_map_banner_configuration[0]['tid']);
     }
 
-		if ($map_client_block) {
+		if ($map_client_block && $map_client_configuration) {
 			$map_config['projection'] = 'EPSG:4326';
 			$map_config['configHost'] = $map_client_configuration->map_config_host;
 			$map_config['configURL'] = $map_client_configuration->map_config_url;
@@ -522,6 +527,7 @@ function _get_edited_map_client_block($mcbid, $values = array()) {
 		$map_client_block = new stdClass();
 	}
 
+  $map_client_block->default_mccid = $values['default_mccid'];
   $map_client_block->show_button_open_map_url = $values['show_button_open_map_url'];
 	$map_client_block->enable_select_layers = $values['enable_select_layers'];
 	$map_client_block->enable_metadata = $values['enable_metadata'];
