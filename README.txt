@@ -1,6 +1,26 @@
-//////////////////////////////////
-// JS dependencies
-//////////////////////////////////
+Content fields
+
+For this module to work it needs the following content fields:
+- Map banner URL
+    MACHINE NAME: field_map_banner
+    FIELD TYPE: Text
+    WIDGET: Text field
+- Map banner Type
+    MACHINE NAME: field_map_banner_type
+    FIELD TYPE: List (text)
+    WIDGET: Select list
+    FIELD SETTINGS:
+      small|Small (20% of the page)
+      medium|Medium (50% of the page)
+      large|Large (80% of the page)
+- Map banner configuration
+    MACHINE NAME: field_map_banner_configuration
+    FIELD TYPE: Term reference
+    WIDGET: Select list
+    FIELD SETTINGS:
+      Vocabulary: Map Client configurations
+
+JS dependencies
 
 This module has dependencies on the following JS libraries:
 - aims-map-withdeps.js
