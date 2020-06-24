@@ -359,7 +359,6 @@ function eatlas_map_client_block_view($delta = '') {
     }
 
 		if ($map_client_block && $map_client_configuration) {
-			$map_config['projection'] = 'EPSG:4326';
 			$map_config['configHost'] = $map_client_configuration->map_config_host;
 			$map_config['configURL'] = $map_client_configuration->map_config_url;
       $map_config['disableDefaultOverlayLayer'] = $map_client_configuration->show_default_overlay_layers === '1' ? false : true;
