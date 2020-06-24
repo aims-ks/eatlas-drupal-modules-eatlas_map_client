@@ -23,7 +23,7 @@
 			featureRequestsResultsPosition: mapConfig.featureRequestsResultsPosition,
 			featureRequestsWmsParams: {
 				BUFFER: 20,
-				FEATURE_COUNT: 10
+				FEATURE_COUNT: 1
 			},
 			defaultActiveComponent: mapConfig.defaultActiveComponent
 		});
