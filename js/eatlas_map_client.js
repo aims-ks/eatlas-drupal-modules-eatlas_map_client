@@ -103,8 +103,9 @@
 					var extent = [mapConfig.bbox.lonMin, mapConfig.bbox.latMin, mapConfig.bbox.lonMax, mapConfig.bbox.latMax];
 
 					// Transform extent if necessary
-					if (mapConfig.bbox.projection !== mapConfig.projection) {
-						extent = ol.extent.applyTransform(extent, ol.proj.getTransform(mapConfig.bbox.projection, mapConfig.projection));
+					if (mapConfig.bbox.projection !== mapClient.getOlMap().getView().getProjection().getCode()) {
+						extent = ol.extent.applyTransform(extent,
+              ol.proj.getTransform(mapConfig.bbox.projection, mapClient.getOlMap().getView().getProjection().getCode()));
 					}
 
 					// mapClient.getOlMap().getView().fit(extent);
