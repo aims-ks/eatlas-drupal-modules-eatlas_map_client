@@ -15,5 +15,5 @@ dependencies[] = eatlas_spatial_publisher (>=0.29)
 project status url = "http://drupal.eatlas.org.au/modules/eatlas"
 
 ; Breaking changes between version 1 and 2. Please first update to v1.6 before updating to v2
-version = "7.x-2.0.2"
+version = "7.x-2.1.0"
 project = "eatlas_map_client"
