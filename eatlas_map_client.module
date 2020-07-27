@@ -436,6 +436,7 @@ function _parse_map_banner_url($map_banner_url) {
 	$map_config['layers'] = array();
 	$layer_visibilities = array();
 	$layer_styles = array();
+	$layer_times = array();
 	$layer_opacity = array();
 	foreach (explode('&', $query_string) as $parameter) {
 		if (strpos($parameter, '=')) {
@@ -468,6 +469,9 @@ function _parse_map_banner_url($map_banner_url) {
 				case 's0':
 					$layer_styles = explode(',', $val);
 					break;
+				case 't0':
+					$layer_times = explode(',', $val);
+					break;
 				case 'o0':
 					$layer_opacity = explode(',', $val);
 					break;
@@ -492,6 +496,15 @@ function _parse_map_banner_url($map_banner_url) {
 		if (isset($map_config['layers'][$key])) {
 			if ($style != '') {
 				$map_config['layers'][$key]['style'] = $style;
+			}
+		}
+	}
+
+	// update layer times
+	foreach ($layer_times as $key => $time) {
+		if (isset($map_config['layers'][$key])) {
+			if ($time != '') {
+				$map_config['layers'][$key]['time'] = $time;
 			}
 		}
 	}

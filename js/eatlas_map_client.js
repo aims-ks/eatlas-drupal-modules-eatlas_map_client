@@ -36,22 +36,29 @@
 			.then(function () {
 				var baseLayersAPI = mapClient.getBaseLayersAPI();
 				mapConfig.layers.forEach(function(layer) {
-					baseLayersAPI.addAvailableLayer(layer.id);
-					if (layer.visible) {
-						baseLayersAPI.addActiveLayer(layer.id);
-					}
+					baseLayersAPI.addAvailableLayer(layer.id)
+            .then(function() {
+              if (layer.visible) {
+                baseLayersAPI.addActiveLayer(layer.id);
+              }
+            });
 				});
 
 				var overlayLayersAPI = mapClient.getOverlayLayersAPI();
 				mapConfig.layers.forEach(function(layer) {
 					overlayLayersAPI.setLayerProperty(layer.id, 'style', layer.style);
+					if (layer.hasOwnProperty('time')) {
+						overlayLayersAPI.setLayerProperty(layer.id, 'time', layer.time);
+					}
 					if (layer.hasOwnProperty('opacity')) {
 						overlayLayersAPI.setLayerProperty(layer.id, 'opacity', layer.opacity);
 					}
-					overlayLayersAPI.addAvailableLayer(layer.id);
-					if (layer.visible) {
-						overlayLayersAPI.addActiveLayer(layer.id);
-					}
+					overlayLayersAPI.addAvailableLayer(layer.id)
+            .then(function() {
+              if (layer.visible) {
+                overlayLayersAPI.addActiveLayer(layer.id);
+              }
+            });
 				});
 			})
 			// add custom controls
@@ -103,8 +110,9 @@
 					var extent = [mapConfig.bbox.lonMin, mapConfig.bbox.latMin, mapConfig.bbox.lonMax, mapConfig.bbox.latMax];
 
 					// Transform extent if necessary
-					if (mapConfig.bbox.projection !== mapConfig.projection) {
-						extent = ol.extent.applyTransform(extent, ol.proj.getTransform(mapConfig.bbox.projection, mapConfig.projection));
+					if (mapConfig.bbox.projection !== mapClient.getOlMap().getView().getProjection().getCode()) {
+						extent = ol.extent.applyTransform(extent,
+              ol.proj.getTransform(mapConfig.bbox.projection, mapClient.getOlMap().getView().getProjection().getCode()));
 					}
 
 					// mapClient.getOlMap().getView().fit(extent);
